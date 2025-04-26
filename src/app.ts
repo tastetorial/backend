@@ -24,7 +24,7 @@ app.all('*', isAuthorized);
 app.use('/api', routes);
 
 
-db.sync({ alter: true }).then(() => {
+db.sync({}).then(() => {
     app.listen(config.PORT, () => console.log(`Server is running on http://localhost:${config.PORT}`));
 })
     .catch(err => console.error('Error connecting to the database', err));

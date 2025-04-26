@@ -1,7 +1,14 @@
 import { Request, Response } from "express"
 import { handleResponse, successResponse } from "../utils/modules"
+import { uploadFileToBlob, uploadFilesToBlob } from "../utils/uploadCloud";
+import { buffer } from "stream/consumers";
 
-const BASE_FOLDER = 'uploads'
+// const BASE_FOLDER = 'uploads'
+
+enum StorageContainer {
+    PROFILE = 'profile-pics',
+    GENERAL = 'general_pics'
+}
 
 export const uploadFiles = async (req: Request, res: Response) => {
     if (!req.files) {
@@ -10,11 +17,21 @@ export const uploadFiles = async (req: Request, res: Response) => {
 
     const files = req.files as Express.Multer.File[];
 
-    const paths = files.map((file: any) => {
-        return `/${BASE_FOLDER}/${file.filename}`
-    });
+    const filesModified = files.map((file) => {
+        return {
+            buffer: file.buffer,
+            name: Date.now() + "--" + file.originalname,
+            mimetype: file.mimetype,
+        }
+    })
 
-    return successResponse(res, 'success', { urls: paths });
+    try {
+        const paths = await uploadFilesToBlob(StorageContainer.GENERAL, filesModified)
+
+        return successResponse(res, 'success', { urls: paths });
+    } catch (error) {
+        return handleResponse(res, 500, false, 'Error uploading files');
+    }
 }
 
 export const uploadFile = async (req: Request, res: Response) => {
@@ -22,17 +39,43 @@ export const uploadFile = async (req: Request, res: Response) => {
         return handleResponse(res, 404, false, 'No file uploaded');
     }
 
-    return successResponse(res, 'success', { url: `/${BASE_FOLDER}/${req.file.filename}` })
+    const file = req.file as Express.Multer.File;
+
+    const fileModified = {
+        buffer: file.buffer,
+        name: Date.now() + "--" + file.originalname,
+        mimetype: file.mimetype,
+    }
+
+    try {
+        const path = await uploadFileToBlob(StorageContainer.GENERAL, fileModified)
+
+        return successResponse(res, 'success', { url: path })
+    } catch (error) {
+        return handleResponse(res, 500, false, 'Error uploading file');
+    }
 }
 
 
 
-export const upload = async (req: Request, res: Response) => {
+export const uploadAvatar = async (req: Request, res: Response) => {
     if (!req.file) {
         return handleResponse(res, 404, false, 'No file uploaded');
     }
 
-    // const url = await upload_cloud(filePath);
+    const file = req.file as Express.Multer.File;
 
-    return successResponse(res, "Successful", { url: `/${BASE_FOLDER}/${req.file.filename}` })
+    const fileModified = {
+        buffer: file.buffer,
+        name: Date.now() + "--" + file.originalname,
+        mimetype: file.mimetype,
+    }
+
+    try {
+        const path = await uploadFileToBlob(StorageContainer.PROFILE, fileModified)
+
+        return successResponse(res, 'success', { url: path })
+    } catch (error) {
+        return handleResponse(res, 500, false, 'Error uploading file');
+    }
 }
