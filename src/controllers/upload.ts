@@ -7,7 +7,7 @@ import { buffer } from "stream/consumers";
 
 enum StorageContainer {
     PROFILE = 'profile-pics',
-    GENERAL = 'general_pics'
+    GENERAL = 'general-pics'
 }
 
 export const uploadFiles = async (req: Request, res: Response) => {
@@ -46,6 +46,8 @@ export const uploadFile = async (req: Request, res: Response) => {
         name: Date.now() + "--" + file.originalname,
         mimetype: file.mimetype,
     }
+
+    console.log('filename', fileModified.name);
 
     try {
         const path = await uploadFileToBlob(StorageContainer.GENERAL, fileModified)

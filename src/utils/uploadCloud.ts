@@ -43,6 +43,7 @@ export const uploadFileToBlob = async (containerName: string = 'general_pics', f
 
     } catch (error: any) {
         console.error('Error uploading file to Azure Blob Storage:', error.message);
+        throw new Error('Error uploading file to Azure Blob Storage: ' + error.message);
     }
 }
 
@@ -79,6 +80,7 @@ export const uploadFilesToBlob = async (containerName: string = 'general_pics', 
 
     } catch (error: any) {
         console.error('Error uploading file to Azure Blob Storage:', error.message);
+        throw new Error('Error uploading file to Azure Blob Storage: ' + error.message);
     }
 }
 
