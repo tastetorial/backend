@@ -22,7 +22,8 @@
     "@types/sequelize": "^4.28.20",
     "@types/validator": "^13.12.2",
     "@types/winston": "^2.4.4",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
   },
   "dependencies": {
     "@azure/storage-blob": "^12.27.0",
@@ -47,7 +48,6 @@
     "sequelize-cli-typescript": "^3.2.0-c",
     "sequelize-typescript": "^2.1.6",
     "tedious": "^19.0.0",
-    "uuid": "^11.1.0",
-    "typescript": "^5.7.3"
+    "uuid": "^11.1.0"
   }
 }
