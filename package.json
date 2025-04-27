@@ -4,8 +4,7 @@
   "main": "app.js",
   "scripts": {
     "dev": "nodemon",
-    "build": "tsc --project ./",
-    "start": "npm run build && node ./build/app.js",
+    "start": "node ./build/app.js",
     "seed:db": "sequelize db:seed:all"
   },
   "keywords": [],
