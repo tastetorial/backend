@@ -9,16 +9,20 @@ export const createPost = async (req: Request, res: Response) => {
 
     const { title, body, views } = req.body;
 
-    const post = await Post.create({
-        title,
-        body,
-        userId: id,
-        views
-    }, {
-        include: View
-    })
+    try {
+        const post = await Post.create({
+            title,
+            body,
+            userId: id,
+            views
+        }, {
+            include: View
+        })
 
-    return successResponse(res, 'success', post);
+        return successResponse(res, 'success', post);
+    } catch (error) {
+        return errorResponse(res, 'error', error);
+    }
 }
 
 export const getPosts = async (req: Request, res: Response) => {
