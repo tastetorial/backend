@@ -17,15 +17,20 @@ const Reaction_1 = require("../models/Reaction");
 const createPost = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.user;
     const { title, body, views } = req.body;
-    const post = yield Post_1.Post.create({
-        title,
-        body,
-        userId: id,
-        views
-    }, {
-        include: View_1.View
-    });
-    return (0, modules_1.successResponse)(res, 'success', post);
+    try {
+        const post = yield Post_1.Post.create({
+            title,
+            body,
+            userId: id,
+            views
+        }, {
+            include: View_1.View
+        });
+        return (0, modules_1.successResponse)(res, 'success', post);
+    }
+    catch (error) {
+        return (0, modules_1.errorResponse)(res, 'error', error);
+    }
 });
 exports.createPost = createPost;
 const getPosts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {

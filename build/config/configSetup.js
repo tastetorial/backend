@@ -55,6 +55,7 @@ const getConfig = () => {
         EMAIL_SERVICE: process.env.EMAIL_SERVICE,
         EMAIL_USER: process.env.EMAIL_USER,
         OTP_EXPIRY_TIME: Number(process.env.OTP_EXPIRY_TIME),
+        APPINSIGHTS_INSTRUMENTATIONKEY: process.env.APPINSIGHTS_INSTRUMENTATIONKEY,
         PUBLIC_ROUTES: [
             '/',
             '/api',

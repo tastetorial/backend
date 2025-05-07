@@ -21,6 +21,7 @@ type Config = {
     EMAIL_USER: string | undefined;
     EMAIL_PASS: string | undefined;
     OTP_EXPIRY_TIME: number;
+    APPINSIGHTS_INSTRUMENTATIONKEY: string | undefined;
 };
 
 const getConfig = (): Config => {
@@ -43,6 +44,7 @@ const getConfig = (): Config => {
         EMAIL_SERVICE: process.env.EMAIL_SERVICE,
         EMAIL_USER: process.env.EMAIL_USER,
         OTP_EXPIRY_TIME: Number(process.env.OTP_EXPIRY_TIME),
+        APPINSIGHTS_INSTRUMENTATIONKEY: process.env.APPINSIGHTS_INSTRUMENTATIONKEY,
         PUBLIC_ROUTES: [
             '/',
             '/api',
