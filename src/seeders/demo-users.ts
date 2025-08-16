@@ -8,28 +8,28 @@ export default {
     up: async (queryInterface: QueryInterface) => {
         const users = [];
 
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 5; i++) {
             users.push({
                 email: faker.internet.email(),
                 emailVerified: faker.datatype.boolean(),
                 phone: '080' + faker.string.numeric(7),
-                username: faker.internet.userName(),
+                username: faker.internet.username(),
                 firstname: faker.person.firstName(),
                 lastname: faker.person.lastName(),
                 birthday: faker.date.birthdate({ min: 1980, max: 2005, mode: 'year' }),
                 status: 'ACTIVE',          // change if you have other statuses
                 password: hashSync('password123', 10),
-                role: roles[Math.floor(Math.random() * roles.length)],           // change if you have other roles
+                role: /*roles[Math.floor(Math.random() * roles.length)]*/ 'viewer',           // change if you have other roles
                 deviceToken: faker.datatype.boolean() ? faker.string.uuid() : null,
                 createdAt: new Date(),
                 updatedAt: new Date(),
             });
         }
 
-        await queryInterface.bulkInsert('user', users);
+        await queryInterface.bulkInsert('users', users);
     },
 
     down: async (queryInterface: QueryInterface) => {
-        await queryInterface.bulkDelete('user', {});
+        await queryInterface.bulkDelete('users', {});
     },
 };

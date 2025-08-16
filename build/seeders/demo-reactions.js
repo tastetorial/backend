@@ -13,10 +13,10 @@ const faker_1 = require("@faker-js/faker");
 exports.default = {
     up: (queryInterface) => __awaiter(void 0, void 0, void 0, function* () {
         // 👉 replace these arrays with your actual user and video IDs
-        const userIds = [1, 2, 3, 4, 5];
-        const videoIds = [1, 2, 3, 4, 5];
+        const userIds = new Array(16).fill(0).map((_, i) => i + 1);
+        const videoIds = new Array(30).fill(0).map((_, i) => i + 1);
         const reactions = [];
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < 100; i++) {
             const randomUserId = userIds[Math.floor(Math.random() * userIds.length)];
             const randomVideoId = videoIds[Math.floor(Math.random() * videoIds.length)];
             const isLike = faker_1.faker.datatype.boolean();
@@ -30,9 +30,9 @@ exports.default = {
                 updatedAt: new Date(),
             });
         }
-        yield queryInterface.bulkInsert('reaction', reactions);
+        yield queryInterface.bulkInsert('reactions', reactions);
     }),
     down: (queryInterface) => __awaiter(void 0, void 0, void 0, function* () {
-        yield queryInterface.bulkDelete('reaction', {});
+        yield queryInterface.bulkDelete('reactions', {});
     }),
 };

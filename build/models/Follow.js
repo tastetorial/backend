@@ -40,5 +40,5 @@ __decorate([
     __metadata("design:type", User_1.User)
 ], Follow.prototype, "follower", void 0);
 exports.Follow = Follow = __decorate([
-    (0, sequelize_typescript_1.Table)({ timestamps: true, tableName: 'follow' })
+    (0, sequelize_typescript_1.Table)({ timestamps: true, tableName: 'follows' })
 ], Follow);

@@ -4,31 +4,34 @@ import { faker } from '@faker-js/faker';
 export default {
     up: async (queryInterface: QueryInterface) => {
         // ⚠️ Replace with the actual user IDs in your database
-        const userIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        const viewerId = [1, 3, 6, 10, 12, 13, 14, 15, 16];
+        const creatorId = [2, 4, 5, 7, 9];
 
         const follows = [];
 
-        for (let i = 0; i < 15; i++) {
-            let followerId = faker.helpers.arrayElement(userIds);
-            let followingId = faker.helpers.arrayElement(userIds);
+        for (let i = 0; i < 20; i++) {
+            let followerId = faker.helpers.arrayElement(viewerId);
+            let followingId = faker.helpers.arrayElement(creatorId);
 
             // ensure a user does not follow themselves
             while (followerId === followingId) {
-                followingId = faker.helpers.arrayElement(userIds);
+                followingId = faker.helpers.arrayElement(creatorId);
             }
 
-            follows.push({
+            const follow = {
                 followerId,
                 followingId,
                 createdAt: new Date(),
                 updatedAt: new Date(),
-            });
+            };
+
+            follows.push(follow);
         }
 
-        await queryInterface.bulkInsert('follow', follows);
+        await queryInterface.bulkInsert('follows', follows);
     },
 
     down: async (queryInterface: QueryInterface) => {
-        await queryInterface.bulkDelete('follow', {});
+        await queryInterface.bulkDelete('follows', {});
     },
 };

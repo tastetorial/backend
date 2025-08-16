@@ -2,7 +2,7 @@ import { Table, Model, Column, DataType, AllowNull, Unique, Default, Index, Belo
 
 
 
-@Table({ timestamps: true, tableName: 'category' })
+@Table({ timestamps: true, tableName: 'categories' })
 export class Category extends Model {
     @PrimaryKey
     @AutoIncrement

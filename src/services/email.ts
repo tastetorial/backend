@@ -4,7 +4,7 @@ import config from '../config/configSetup'
 
 export async function sendEmail(to: string, subject: string, text: string, username: string | undefined) {
     const mailOptions = {
-        from: config.EMAIL_USER,
+        from: config.EMAIL_FROM,
         to: to,
         subject: subject,
         text: '',

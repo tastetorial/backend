@@ -3,7 +3,7 @@ import { User } from './User';
 
 
 
-@Table({ timestamps: true, tableName: 'creator' })
+@Table({ timestamps: true, tableName: 'creators' })
 export class Creator extends Model {
     @PrimaryKey
     @AutoIncrement

@@ -13,25 +13,27 @@ const faker_1 = require("@faker-js/faker");
 exports.default = {
     up: (queryInterface) => __awaiter(void 0, void 0, void 0, function* () {
         // ⚠️ Replace with the actual user IDs in your database
-        const userIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        const viewerId = [1, 3, 6, 10, 12, 13, 14, 15, 16];
+        const creatorId = [2, 4, 5, 7, 9];
         const follows = [];
-        for (let i = 0; i < 15; i++) {
-            let followerId = faker_1.faker.helpers.arrayElement(userIds);
-            let followingId = faker_1.faker.helpers.arrayElement(userIds);
+        for (let i = 0; i < 20; i++) {
+            let followerId = faker_1.faker.helpers.arrayElement(viewerId);
+            let followingId = faker_1.faker.helpers.arrayElement(creatorId);
             // ensure a user does not follow themselves
             while (followerId === followingId) {
-                followingId = faker_1.faker.helpers.arrayElement(userIds);
+                followingId = faker_1.faker.helpers.arrayElement(creatorId);
             }
-            follows.push({
+            const follow = {
                 followerId,
                 followingId,
                 createdAt: new Date(),
                 updatedAt: new Date(),
-            });
+            };
+            follows.push(follow);
         }
-        yield queryInterface.bulkInsert('follow', follows);
+        yield queryInterface.bulkInsert('follows', follows);
     }),
     down: (queryInterface) => __awaiter(void 0, void 0, void 0, function* () {
-        yield queryInterface.bulkDelete('follow', {});
+        yield queryInterface.bulkDelete('follows', {});
     }),
 };

@@ -36,5 +36,5 @@ __decorate([
     __metadata("design:type", String)
 ], Category.prototype, "image", void 0);
 exports.Category = Category = __decorate([
-    (0, sequelize_typescript_1.Table)({ timestamps: true, tableName: 'category' })
+    (0, sequelize_typescript_1.Table)({ timestamps: true, tableName: 'categories' })
 ], Category);

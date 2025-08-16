@@ -11,7 +11,7 @@ const passwordReset = (otp) => {
         body: `
     <p>We have received a request to reset your password. Use the OTP below to reset your password.</p>
     <h1 style="text-align: center">${otp}</h1>
-    <p>Note that this OTP expires in ${configSetup_1.default.OTP_EXPIRY_TIME} mins</p>
+    <p>Note that this OTP expires in ${configSetup_1.default.OTP_EXPIRY_TIME} minutes</p>
     `
     };
 };
@@ -22,7 +22,7 @@ const verifyEmail = (otp) => {
         body: `
     <p>We have received a request to verify your email. Use the OTP below to verify your email.</p>
    <h1 style="text-align: center">${otp}</h1>
-    <p>Note that this OTP expires in ${configSetup_1.default.OTP_EXPIRY_TIME}</p>
+    <p>Note that this OTP expires in ${configSetup_1.default.OTP_EXPIRY_TIME} minutes</p>
     `
     };
 };

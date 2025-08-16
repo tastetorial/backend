@@ -6,7 +6,7 @@ import { Category } from './Category';
 
 
 
-@Table({ timestamps: true, tableName: 'video' })
+@Table({ timestamps: true, tableName: 'videos' })
 export class Video extends Model {
     @PrimaryKey
     @AutoIncrement
@@ -64,4 +64,15 @@ export class Video extends Model {
     @Column(DataType.BIGINT)
     userId!: number;
 
+
+    @BelongsTo(() => Category)
+    category!: Category;
+
+
+    @BelongsTo(() => User)
+    creator!: User;
+
+
+    @HasMany(() => Reaction)
+    reactions!: Reaction[];
 }

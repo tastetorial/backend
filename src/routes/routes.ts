@@ -8,6 +8,7 @@ import { upload } from "../utils/upload";
 // import { createReaction, deleteReaction, getAverageRating, getLikes } from "../controllers/reaction";
 // import { getProfile, getProfiles } from "../controllers/profile";
 import { uploadFile } from "../controllers/upload";
+import { getVideos } from "../controllers/video";
 
 router.post('/auth/register', register)
 router.post('/auth/send-otp', sendOTP)
@@ -27,7 +28,7 @@ router.post('/uploads/avatar', upload.single('avatar'), uploadFile)
 router.post('/uploads/video', upload.single('video'), uploadFile)
 router.post('/uploads/thumbnail', upload.single('thumbnail'), uploadFile)
 
-// router.get('/posts', getPosts);
+router.get('/videos', getVideos);
 // router.get('/posts/:postId', getPost);
 // router.post('/posts', createPost);
 // router.put('/posts/:postId', updatePost)

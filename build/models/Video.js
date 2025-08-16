@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Video = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
 const User_1 = require("./User");
+const Reaction_1 = require("./Reaction");
 const enum_1 = require("../enum");
 const Category_1 = require("./Category");
 let Video = class Video extends sequelize_typescript_1.Model {
@@ -72,6 +73,18 @@ __decorate([
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.BIGINT),
     __metadata("design:type", Number)
 ], Video.prototype, "userId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.BelongsTo)(() => Category_1.Category),
+    __metadata("design:type", Category_1.Category)
+], Video.prototype, "category", void 0);
+__decorate([
+    (0, sequelize_typescript_1.BelongsTo)(() => User_1.User),
+    __metadata("design:type", User_1.User)
+], Video.prototype, "creator", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasMany)(() => Reaction_1.Reaction),
+    __metadata("design:type", Array)
+], Video.prototype, "reactions", void 0);
 exports.Video = Video = __decorate([
-    (0, sequelize_typescript_1.Table)({ timestamps: true, tableName: 'video' })
+    (0, sequelize_typescript_1.Table)({ timestamps: true, tableName: 'videos' })
 ], Video);

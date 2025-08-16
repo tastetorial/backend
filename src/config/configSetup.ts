@@ -19,6 +19,7 @@ type Config = {
     EMAIL_HOST: string | undefined;
     EMAIL_PORT: number;
     EMAIL_USER: string | undefined;
+    EMAIL_FROM: string | undefined,
     EMAIL_PASS: string | undefined;
     OTP_EXPIRY_TIME: number;
     APPINSIGHTS_INSTRUMENTATIONKEY: string | undefined;
@@ -43,6 +44,7 @@ const getConfig = (): Config => {
         EMAIL_PORT: Number(process.env.EMAIL_PORT),
         EMAIL_SERVICE: process.env.EMAIL_SERVICE,
         EMAIL_USER: process.env.EMAIL_USER,
+        EMAIL_FROM: process.env.EMAIL_FROM,
         OTP_EXPIRY_TIME: Number(process.env.OTP_EXPIRY_TIME),
         APPINSIGHTS_INSTRUMENTATIONKEY: process.env.APPINSIGHTS_INSTRUMENTATIONKEY,
         PUBLIC_ROUTES: [

@@ -37,5 +37,5 @@ __decorate([
     __metadata("design:type", Boolean)
 ], OTP.prototype, "isVerified", void 0);
 exports.OTP = OTP = __decorate([
-    (0, sequelize_typescript_1.Table)({ timestamps: false, tableName: 'otp' })
+    (0, sequelize_typescript_1.Table)({ timestamps: false, tableName: 'otps' })
 ], OTP);

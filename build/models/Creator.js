@@ -36,5 +36,5 @@ __decorate([
     __metadata("design:type", User_1.User)
 ], Creator.prototype, "user", void 0);
 exports.Creator = Creator = __decorate([
-    (0, sequelize_typescript_1.Table)({ timestamps: true, tableName: 'creator' })
+    (0, sequelize_typescript_1.Table)({ timestamps: true, tableName: 'creators' })
 ], Creator);

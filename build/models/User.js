@@ -59,6 +59,11 @@ __decorate([
 ], User.prototype, "lastname", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(true),
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.STRING),
+    __metadata("design:type", String)
+], User.prototype, "avatar", void 0);
+__decorate([
+    (0, sequelize_typescript_1.AllowNull)(true),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.DATEONLY),
     __metadata("design:type", Date)
 ], User.prototype, "birthday", void 0);
@@ -95,5 +100,5 @@ __decorate([
     __metadata("design:type", Array)
 ], User.prototype, "followings", void 0);
 exports.User = User = __decorate([
-    (0, sequelize_typescript_1.Table)({ timestamps: true, tableName: 'user' })
+    (0, sequelize_typescript_1.Table)({ timestamps: true, tableName: 'users' })
 ], User);

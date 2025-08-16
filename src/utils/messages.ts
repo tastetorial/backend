@@ -17,7 +17,7 @@ export const passwordReset = (otp: string): Message => {
         body: `
     <p>We have received a request to reset your password. Use the OTP below to reset your password.</p>
     <h1 style="text-align: center">${otp}</h1>
-    <p>Note that this OTP expires in ${config.OTP_EXPIRY_TIME} mins</p>
+    <p>Note that this OTP expires in ${config.OTP_EXPIRY_TIME} minutes</p>
     `
     }
 }
@@ -29,7 +29,7 @@ export const verifyEmail = (otp: string): Message => {
         body: `
     <p>We have received a request to verify your email. Use the OTP below to verify your email.</p>
    <h1 style="text-align: center">${otp}</h1>
-    <p>Note that this OTP expires in ${config.OTP_EXPIRY_TIME}</p>
+    <p>Note that this OTP expires in ${config.OTP_EXPIRY_TIME} minutes</p>
     `
     }
 }

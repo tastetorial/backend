@@ -8,30 +8,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendEmail = sendEmail;
-const email_1 = require("../config/email");
-const template_1 = require("../utils/template");
-const configSetup_1 = __importDefault(require("../config/configSetup"));
-function sendEmail(to, subject, text, username) {
+exports.up = up;
+exports.down = down;
+const sequelize_1 = require("sequelize");
+const faker_1 = require("@faker-js/faker");
+function up(queryInterface) {
     return __awaiter(this, void 0, void 0, function* () {
-        const mailOptions = {
-            from: configSetup_1.default.EMAIL_FROM,
-            to: to,
-            subject: subject,
-            text: '',
-            html: (0, template_1.templateData)(text, username)
-        };
-        try {
-            const info = yield email_1.transporter.sendMail(mailOptions);
-            return info;
+        // fetch all existing users
+        const users = yield queryInterface.sequelize.query('SELECT id FROM users', { type: sequelize_1.QueryTypes.SELECT });
+        for (const user of users) {
+            const avatarUrl = faker_1.faker.image.avatar();
+            yield queryInterface.bulkUpdate('users', { avatar: avatarUrl, updatedAt: new Date() }, { id: user.id });
         }
-        catch (error) {
-            console.log(error);
-            return;
-        }
+    });
+}
+function down(queryInterface) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // optional: clear avatar column for rollback
+        yield queryInterface.bulkUpdate('users', { avatar: null }, {});
     });
 }

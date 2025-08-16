@@ -49,6 +49,10 @@ __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => User_1.User, 'userId'),
     __metadata("design:type", User_1.User)
 ], Reaction.prototype, "user", void 0);
+__decorate([
+    (0, sequelize_typescript_1.BelongsTo)(() => Video_1.Video, 'videoId'),
+    __metadata("design:type", Video_1.Video)
+], Reaction.prototype, "video", void 0);
 exports.Reaction = Reaction = __decorate([
-    (0, sequelize_typescript_1.Table)({ timestamps: true, tableName: 'reaction' })
+    (0, sequelize_typescript_1.Table)({ timestamps: true, tableName: 'reactions' })
 ], Reaction);

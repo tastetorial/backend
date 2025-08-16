@@ -15,26 +15,26 @@ const roles = ['viewer', 'creator', 'admin'];
 exports.default = {
     up: (queryInterface) => __awaiter(void 0, void 0, void 0, function* () {
         const users = [];
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 5; i++) {
             users.push({
                 email: faker_1.faker.internet.email(),
                 emailVerified: faker_1.faker.datatype.boolean(),
                 phone: '080' + faker_1.faker.string.numeric(7),
-                username: faker_1.faker.internet.userName(),
+                username: faker_1.faker.internet.username(),
                 firstname: faker_1.faker.person.firstName(),
                 lastname: faker_1.faker.person.lastName(),
                 birthday: faker_1.faker.date.birthdate({ min: 1980, max: 2005, mode: 'year' }),
                 status: 'ACTIVE', // change if you have other statuses
                 password: (0, bcryptjs_1.hashSync)('password123', 10),
-                role: roles[Math.floor(Math.random() * roles.length)], // change if you have other roles
+                role: /*roles[Math.floor(Math.random() * roles.length)]*/ 'viewer', // change if you have other roles
                 deviceToken: faker_1.faker.datatype.boolean() ? faker_1.faker.string.uuid() : null,
                 createdAt: new Date(),
                 updatedAt: new Date(),
             });
         }
-        yield queryInterface.bulkInsert('user', users);
+        yield queryInterface.bulkInsert('users', users);
     }),
     down: (queryInterface) => __awaiter(void 0, void 0, void 0, function* () {
-        yield queryInterface.bulkDelete('user', {});
+        yield queryInterface.bulkDelete('users', {});
     }),
 };

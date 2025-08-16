@@ -2,7 +2,7 @@ import { Table, Model, Column, DataType, HasOne, BelongsToMany, HasMany, AllowNu
 import { User } from './User';
 import { Video } from './Video';
 
-@Table({ timestamps: true, tableName: 'reaction' })
+@Table({ timestamps: true, tableName: 'reactions' })
 export class Reaction extends Model {
     @PrimaryKey
     @AutoIncrement
@@ -39,4 +39,8 @@ export class Reaction extends Model {
 
     @BelongsTo(() => User, 'userId')
     user!: User;
+
+
+    @BelongsTo(() => Video, 'videoId')
+    video!: Video;
 }

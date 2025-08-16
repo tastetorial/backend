@@ -12,18 +12,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const faker_1 = require("@faker-js/faker");
 exports.default = {
     up: (queryInterface) => __awaiter(void 0, void 0, void 0, function* () {
-        // → if you already have user IDs in your user table, list them here or query dynamically.
-        // For this example, we’ll assume the users with IDs 3, 5, 7, 8, 10 are creators.
-        const userIds = [3, 5, 7, 8, 10];
+        const userIds = [2, 4, 5, 7, 9];
         const creators = userIds.map((userId) => ({
             bio: faker_1.faker.lorem.sentences({ min: 1, max: 3 }),
             userId,
             createdAt: new Date(),
             updatedAt: new Date(),
         }));
-        yield queryInterface.bulkInsert('creator', creators);
+        yield queryInterface.bulkInsert('creators', creators);
     }),
     down: (queryInterface) => __awaiter(void 0, void 0, void 0, function* () {
-        yield queryInterface.bulkDelete('creator', {});
+        yield queryInterface.bulkDelete('creators', {});
     }),
 };

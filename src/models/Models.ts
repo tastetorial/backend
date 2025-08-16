@@ -4,6 +4,7 @@ import { Video } from './Video'
 import { Reaction } from './Reaction'
 import { Follow } from './Follow'
 import { Category } from './Category'
+import { Creator } from './Creator'
 
 
 export {
@@ -12,5 +13,6 @@ export {
     Video,
     Reaction,
     Follow,
-    Category
+    Category,
+    Creator
 }

@@ -4,34 +4,34 @@ import { faker } from '@faker-js/faker';
 export default {
     up: async (queryInterface: QueryInterface) => {
         // 🔁 Adjust to your actual existing user and category IDs
-        const userIds = [1, 2, 3, 4, 5];
+        const creatorIds = [2, 4, 5, 7, 9];
         const categoryIds = [1, 2, 3, 4, 5];
 
         const videos = [];
 
-        for (let i = 0; i < 10; i++) {
-            const randomUserId = userIds[Math.floor(Math.random() * userIds.length)];
+        for (let i = 0; i < 30; i++) {
+            const randomCreatorId = creatorIds[Math.floor(Math.random() * creatorIds.length)];
             const randomCategoryId = categoryIds[Math.floor(Math.random() * categoryIds.length)];
 
             videos.push({
                 title: faker.lorem.words({ min: 2, max: 5 }),
                 videoUrl: faker.internet.url(),
-                thumbnailUrl: faker.image.url(),  // if you're using faker <v8 use faker.image.imageUrl()
+                thumbnailUrl: faker.image.url(),
                 description: faker.lorem.sentence(),
                 views: faker.number.int({ min: 0, max: 5000 }),
-                status: 'PUBLISHED',              // or use random if you have multiple statuses
+                status: 'published',
                 tags: faker.lorem.words({ min: 2, max: 5 }),
                 categoryId: randomCategoryId,
-                userId: randomUserId,
+                userId: randomCreatorId,
                 createdAt: new Date(),
                 updatedAt: new Date(),
             });
         }
 
-        await queryInterface.bulkInsert('video', videos);
+        await queryInterface.bulkInsert('videos', videos);
     },
 
     down: async (queryInterface: QueryInterface) => {
-        await queryInterface.bulkDelete('video', {});
+        await queryInterface.bulkDelete('videos', {});
     },
 };

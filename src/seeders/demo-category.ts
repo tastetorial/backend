@@ -2,7 +2,7 @@ import { QueryInterface } from 'sequelize';
 
 export default {
     up: async (queryInterface: QueryInterface) => {
-        await queryInterface.bulkInsert('category', [
+        await queryInterface.bulkInsert('categories', [
             {
                 name: 'Entertainment',
                 description: 'Comedy, music, dance and more',
@@ -42,6 +42,6 @@ export default {
     },
 
     down: async (queryInterface: QueryInterface) => {
-        await queryInterface.bulkDelete('category', {});
+        await queryInterface.bulkDelete('categories', {});
     },
 };

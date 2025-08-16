@@ -10,6 +10,7 @@ const upload_1 = require("../utils/upload");
 // import { createReaction, deleteReaction, getAverageRating, getLikes } from "../controllers/reaction";
 // import { getProfile, getProfiles } from "../controllers/profile";
 const upload_2 = require("../controllers/upload");
+const video_1 = require("../controllers/video");
 router.post('/auth/register', auth_1.register);
 router.post('/auth/send-otp', auth_1.sendOTP);
 router.post('/auth/verify-otp', auth_1.verifyOTP);
@@ -23,7 +24,7 @@ router.post('update-profile', auth_1.updateProfile);
 router.post('/uploads/avatar', upload_1.upload.single('avatar'), upload_2.uploadFile);
 router.post('/uploads/video', upload_1.upload.single('video'), upload_2.uploadFile);
 router.post('/uploads/thumbnail', upload_1.upload.single('thumbnail'), upload_2.uploadFile);
-// router.get('/posts', getPosts);
+router.get('/videos', video_1.getVideos);
 // router.get('/posts/:postId', getPost);
 // router.post('/posts', createPost);
 // router.put('/posts/:postId', updatePost)

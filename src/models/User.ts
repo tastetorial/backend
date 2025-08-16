@@ -6,7 +6,7 @@ import { Video } from './Video';
 
 
 
-@Table({ timestamps: true, tableName: 'user' })
+@Table({ timestamps: true, tableName: 'users' })
 export class User extends Model {
     @PrimaryKey
     @AutoIncrement
@@ -52,6 +52,11 @@ export class User extends Model {
     @AllowNull(true)
     @Column(DataType.STRING(100))
     lastname!: string;
+
+
+    @AllowNull(true)
+    @Column(DataType.STRING)
+    avatar!: string;
 
 
 
