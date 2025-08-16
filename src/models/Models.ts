@@ -1,18 +1,16 @@
 import { User } from './User'
 import { OTP } from './OTP'
-import { Profile } from './Profile'
-import { Post } from './Post'
+import { Video } from './Video'
 import { Reaction } from './Reaction'
-import { View } from './View'
 import { Follow } from './Follow'
+import { Category } from './Category'
 
 
 export {
     User,
-    Profile,
     OTP,
-    Post,
+    Video,
     Reaction,
-    View,
-    Follow
+    Follow,
+    Category
 }

@@ -9,15 +9,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Reaction = exports.ReactionType = void 0;
+exports.Reaction = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
 const User_1 = require("./User");
-const Post_1 = require("./Post");
-var ReactionType;
-(function (ReactionType) {
-    ReactionType["LIKE"] = "like";
-    ReactionType["RATING"] = "rating";
-})(ReactionType || (exports.ReactionType = ReactionType = {}));
+const Video_1 = require("./Video");
 let Reaction = class Reaction extends sequelize_typescript_1.Model {
 };
 exports.Reaction = Reaction;
@@ -29,28 +24,31 @@ __decorate([
 ], Reaction.prototype, "id", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(false),
-    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.ENUM(...Object.values(ReactionType))),
-    __metadata("design:type", String)
-], Reaction.prototype, "type", void 0);
+    (0, sequelize_typescript_1.Default)(false),
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.BOOLEAN),
+    __metadata("design:type", Boolean)
+], Reaction.prototype, "like", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(true),
-    (0, sequelize_typescript_1.Min)(1),
-    (0, sequelize_typescript_1.Max)(5),
-    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.TINYINT),
-    __metadata("design:type", Number)
-], Reaction.prototype, "value", void 0);
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.TEXT),
+    __metadata("design:type", String)
+], Reaction.prototype, "comment", void 0);
 __decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => Post_1.Post),
+    (0, sequelize_typescript_1.ForeignKey)(() => Video_1.Video),
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.BIGINT),
     __metadata("design:type", Number)
-], Reaction.prototype, "postId", void 0);
+], Reaction.prototype, "videoId", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => User_1.User),
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.BIGINT),
     __metadata("design:type", Number)
 ], Reaction.prototype, "userId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.BelongsTo)(() => User_1.User, 'userId'),
+    __metadata("design:type", User_1.User)
+], Reaction.prototype, "user", void 0);
 exports.Reaction = Reaction = __decorate([
-    (0, sequelize_typescript_1.Table)({ timestamps: true, tableName: 'reactions' })
+    (0, sequelize_typescript_1.Table)({ timestamps: true, tableName: 'reaction' })
 ], Reaction);

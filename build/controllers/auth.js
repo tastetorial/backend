@@ -12,18 +12,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.me = exports.sendOTP = exports.verifyOTP = exports.login = exports.register2 = exports.register = void 0;
+exports.me = exports.sendOTP = exports.verifyOTP = exports.resetPassword = exports.changePassword = exports.updateProfile = exports.login = exports.register = void 0;
 const modules_1 = require("../utils/modules");
 const Models_1 = require("../models/Models");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const email_1 = require("../services/email");
 const jsonwebtoken_1 = require("jsonwebtoken");
 const configSetup_1 = __importDefault(require("../config/configSetup"));
-const OTP_1 = require("../models/OTP");
+const enum_1 = require("../enum");
 const messages_1 = require("../utils/messages");
-const User_1 = require("../models/User");
+const enum_2 = require("../enum");
+const body_1 = require("../validation/body");
 const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let { email, phone, firstName, lastName, password, confirmPassword } = req.body;
+    const result = body_1.registerSchema.safeParse(req.body);
+    if (!result.success)
+        return res.status(400).json({
+            error: "Invalid input",
+            issues: result.error.format()
+        });
+    let { email, phone, firstName, lastName, password, confirmPassword } = result.data;
     if (password !== confirmPassword) {
         return (0, modules_1.handleResponse)(res, 400, false, 'Password does not match');
     }
@@ -36,66 +43,38 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             return (0, modules_1.handleResponse)(res, 400, false, 'User already exists');
         }
         let hashPassword = yield bcryptjs_1.default.hash(password, 10);
-        //user id
-        const userId = `00${(0, modules_1.getRandom)(7)}`;
         const user = yield Models_1.User.create({
             email,
-            userId,
             phone,
+            firstname: firstName,
+            lastname: lastName,
             password: hashPassword,
-            role: User_1.UserRole.USER
+            role: enum_2.UserRole.VIEWER
         });
         user.password = undefined;
-        const profile = yield Models_1.Profile.create({
-            firstName,
-            lastName,
-            userId: user.id
-        });
         let otp = (0, modules_1.getRandom)(6).toString();
         let otpExpires = new Date(Date.now() + configSetup_1.default.OTP_EXPIRY_TIME * 60 * 1000);
         let otpRecord = yield Models_1.OTP.create({ email, otp, expiresAt: otpExpires });
         let emailSendStatus;
-        let messageId = yield (0, email_1.sendEmail)(email, (0, messages_1.welcomeEmail)(otp).subject, (0, messages_1.welcomeEmail)(otp).body, profile.firstName);
+        let emailToSend = (0, messages_1.welcomeEmail)(otp);
+        let messageId = yield (0, email_1.sendEmail)(email, emailToSend.subject, emailToSend.body, user.firstname);
         emailSendStatus = Boolean(messageId);
         return (0, modules_1.handleResponse)(res, 200, true, 'User registered successfully', {
             user, emailSendStatus
         });
     }
     catch (error) {
+        console.log(error);
         return (0, modules_1.handleResponse)(res, 500, false, 'An error occurred', error);
     }
 });
 exports.register = register;
-const register2 = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id, role } = req.user;
-    const { otherNames, dateOfBirth, address, description, privacy, postCode, category } = req.body;
-    if (!dateOfBirth || !address || !privacy || !postCode || !category)
-        return (0, modules_1.handleResponse)(res, 400, false, 'Please provide all required fields');
-    try {
-        let updated = yield Models_1.Profile.update({
-            otherNames,
-            dateOfBirth,
-            address,
-            description,
-            privacy,
-            postCode,
-            category,
-        }, {
-            where: {
-                userId: id
-            }
-        });
-        return (0, modules_1.handleResponse)(res, 200, true, 'Profile updated successfully', updated);
-    }
-    catch (error) {
-        return (0, modules_1.handleResponse)(res, 500, false, error.message);
-    }
-});
-exports.register2 = register2;
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let { email, password } = req.body;
-    if (!email || !password)
-        return (0, modules_1.handleResponse)(res, 400, false, 'Please provide email and password');
+    let result = body_1.loginSchema.safeParse(req.body);
+    if (!result.success) {
+        return res.status(400).json({ errors: result.error.flatten() });
+    }
+    let { email, password } = result.data;
     try {
         let user = yield Models_1.User.findOne({ where: { email } });
         if (!user)
@@ -104,6 +83,8 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         if (!passwordMatch)
             return (0, modules_1.handleResponse)(res, 401, false, 'Invalid password');
         user.password = undefined;
+        if (!user.emailVerified)
+            return (0, modules_1.handleResponse)(res, 401, false, 'Please verify your email');
         let token = (0, jsonwebtoken_1.sign)({ id: user.id, email: user.email, role: user.role }, configSetup_1.default.TOKEN_SECRET);
         return (0, modules_1.successResponse)(res, 'Login successful', {
             user: user,
@@ -111,50 +92,138 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
     catch (error) {
+        console.log(error);
         return (0, modules_1.errorResponse)(res, 'error', error);
     }
 });
 exports.login = login;
-const verifyOTP = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let { email, otp, reason } = req.body;
-    let otpRecord = yield Models_1.OTP.findOne({ where: { email, otp } });
-    if (!otpRecord)
-        return (0, modules_1.handleResponse)(res, 404, false, 'OTP not found');
-    if (otpRecord.expiresAt < new Date()) {
-        otpRecord.destroy();
-        return (0, modules_1.handleResponse)(res, 401, false, 'OTP expired');
+const updateProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = body_1.updateProfileSchema.safeParse(req.body);
+    if (!result.success) {
+        return res.status(400).json({ errors: result.error.flatten() });
     }
-    if (reason === OTP_1.OTPReason.VERIFY_EMAIL) {
-        let user = yield Models_1.User.findOne({ where: { email } });
-        if (!user)
+    try {
+        const updated = yield Models_1.User.update(result.data, {
+            where: { id: req.user.id }
+        });
+        return (0, modules_1.successResponse)(res, 'Profile updated successfully', {});
+    }
+    catch (error) {
+        console.log(error);
+        return (0, modules_1.errorResponse)(res, 'error', error);
+    }
+});
+exports.updateProfile = updateProfile;
+const changePassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = body_1.changePasswordSchema.safeParse(req.body);
+    if (!result.success) {
+        return res.status(400).json({ errors: result.error.flatten() });
+    }
+    const { oldPassword, newPassword } = result.data;
+    try {
+        const user = yield Models_1.User.findOne({
+            where: { id: req.user.id }
+        });
+        if (!user) {
             return (0, modules_1.handleResponse)(res, 404, false, 'User not found');
-        user.emailVerified = true;
-        yield user.save();
+        }
+        const match = yield bcryptjs_1.default.compare(oldPassword, user.password || '');
+        if (!match) {
+            return (0, modules_1.handleResponse)(res, 400, false, 'Old password does not match');
+        }
+        const hashedPassword = yield bcryptjs_1.default.hash(newPassword, 10);
+        const updated = yield Models_1.User.update({ password: hashedPassword }, {
+            where: { id: req.user.id }
+        });
+        return (0, modules_1.successResponse)(res, 'Password changed successfully');
     }
-    yield otpRecord.destroy();
-    return (0, modules_1.successResponse)(res, 'OTP verified');
+    catch (error) {
+        console.log(error);
+        return (0, modules_1.errorResponse)(res, 'error', error);
+    }
+});
+exports.changePassword = changePassword;
+const resetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = body_1.resetPasswordSchema.safeParse(req.body);
+    if (!result.success) {
+        return res.status(400).json({ errors: result.error.flatten() });
+    }
+    const { email, newPassword } = result.data;
+    try {
+        const user = yield Models_1.User.findOne({
+            where: { email }
+        });
+        if (!user) {
+            return (0, modules_1.handleResponse)(res, 404, false, 'User not found');
+        }
+        const hashedPassword = yield bcryptjs_1.default.hash(newPassword, 10);
+        const updated = yield Models_1.User.update({ password: hashedPassword }, {
+            where: { id: user.id }
+        });
+        return (0, modules_1.successResponse)(res, 'Password reset successfully');
+    }
+    catch (error) {
+        console.log(error);
+        return (0, modules_1.errorResponse)(res, 'error', error);
+    }
+});
+exports.resetPassword = resetPassword;
+const verifyOTP = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = body_1.verifyOTPSchema.safeParse(req.body);
+    if (!result.success) {
+        return res.status(400).json({ errors: result.error.flatten() });
+    }
+    let { email, otp, reason } = result.data;
+    try {
+        let otpRecord = yield Models_1.OTP.findOne({ where: { email, otp } });
+        if (!otpRecord)
+            return (0, modules_1.handleResponse)(res, 404, false, 'OTP not found');
+        if (otpRecord.expiresAt < new Date()) {
+            otpRecord.destroy();
+            return (0, modules_1.handleResponse)(res, 401, false, 'OTP expired');
+        }
+        if (reason === enum_1.OTPReason.VERIFY_EMAIL) {
+            let user = yield Models_1.User.findOne({ where: { email } });
+            if (!user)
+                return (0, modules_1.handleResponse)(res, 404, false, 'User not found');
+            user.emailVerified = true;
+            yield user.save();
+        }
+        yield otpRecord.destroy();
+        return (0, modules_1.successResponse)(res, 'OTP verified');
+    }
+    catch (error) {
+        console.log(error);
+        return (0, modules_1.errorResponse)(res, 'error', error);
+    }
 });
 exports.verifyOTP = verifyOTP;
 const sendOTP = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let { email, reason } = req.body;
-    let user = yield Models_1.User.findOne({ where: { email } });
-    if (!user)
-        return (0, modules_1.handleResponse)(res, 404, false, 'User not found');
-    let otp = (0, modules_1.getRandom)(6).toString();
-    let otpExpires = new Date(Date.now() + configSetup_1.default.OTP_EXPIRY_TIME * 60 * 1000);
-    let otpRecord = yield Models_1.OTP.create({ email, otp, expiresAt: otpExpires });
-    let emailSendStatus;
-    if (reason === OTP_1.OTPReason.FORGOT_PASSWORD) {
-        let resetEmail = (0, messages_1.passwordReset)(otp);
-        let messageId = yield (0, email_1.sendEmail)(email, resetEmail.subject, resetEmail.body, 'User');
-        emailSendStatus = Boolean(messageId);
+    try {
+        let { email, reason } = req.body;
+        let user = yield Models_1.User.findOne({ where: { email } });
+        if (!user)
+            return (0, modules_1.handleResponse)(res, 404, false, 'User not found');
+        let otp = (0, modules_1.getRandom)(6).toString();
+        let otpExpires = new Date(Date.now() + configSetup_1.default.OTP_EXPIRY_TIME * 60 * 1000);
+        let otpRecord = yield Models_1.OTP.create({ email, otp, expiresAt: otpExpires });
+        let emailSendStatus;
+        if (reason === enum_1.OTPReason.FORGOT_PASSWORD) {
+            let resetEmail = (0, messages_1.passwordReset)(otp);
+            let messageId = yield (0, email_1.sendEmail)(email, resetEmail.subject, resetEmail.body, 'User');
+            emailSendStatus = Boolean(messageId);
+        }
+        else if (reason === enum_1.OTPReason.VERIFY_EMAIL) {
+            let emailSent = (0, messages_1.verifyEmail)(otp);
+            let messageId = yield (0, email_1.sendEmail)(email, emailSent.subject, emailSent.body, 'User');
+            emailSendStatus = Boolean(messageId);
+        }
+        return (0, modules_1.successResponse)(res, 'OTP sent', { emailSendStatus });
     }
-    else if (reason === OTP_1.OTPReason.VERIFY_EMAIL) {
-        let emailSent = (0, messages_1.verifyEmail)(otp);
-        let messageId = yield (0, email_1.sendEmail)(email, emailSent.subject, emailSent.body, 'User');
-        emailSendStatus = Boolean(messageId);
+    catch (error) {
+        console.log(error);
+        return (0, modules_1.errorResponse)(res, 'Error sending OTP', error);
     }
-    return (0, modules_1.successResponse)(res, 'OTP sent', { emailSendStatus });
 });
 exports.sendOTP = sendOTP;
 const me = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -165,11 +234,8 @@ const me = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 exclude: ['password'],
             },
             include: [{
-                    model: Models_1.Profile,
-                    as: 'profile'
-                }, {
-                    model: Models_1.Post,
-                    as: 'posts',
+                    model: Models_1.Video,
+                    as: 'videos',
                 }, {
                     model: Models_1.User,
                     as: 'followings',

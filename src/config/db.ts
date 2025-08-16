@@ -5,18 +5,20 @@ import * as models from "../models/Models"
 const sequelize = new Sequelize({
     dialect: 'mssql',
     host: config.DBHOST,
-    port: config.DBPORT,
+    port: Number(config.DBPORT),
     username: config.DBUSERNAME,
-    password: config.DBPASSWORD,
+    password: config.DBPASSWORD || undefined,
     database: config.DBNAME,
     models: Object.values(models),
     dialectOptions: {
         options: {
             encrypt: true,
-            trustServerCertificate: false,
+            trustServerCertificate: true,
         },
     },
+    logging: false,
 });
+
 
 // console.log('DB_CONNECTION_STRING:', config.DB_CONNECTION_STRING);
 

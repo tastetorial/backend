@@ -1,17 +1,27 @@
 import { Request, Response, response } from 'express';
 import { getRandom, hash, handleResponse, successResponse, successResponseFalse, validateEmail, randomId, errorResponse } from '../utils/modules';
-import { User, OTP, Profile, Follow, Post, Reaction } from '../models/Models'
+import { User, OTP, Follow, Reaction, Video } from '../models/Models'
 import bcrypt from 'bcryptjs'
 import { sendEmail } from '../services/email';
 import { sign } from 'jsonwebtoken';
 import config from '../config/configSetup'
-import { OTPReason } from '../models/OTP';
-import { passwordReset, registerEmail, verifyEmail, welcomeEmail } from '../utils/messages';
-import { UserRole } from '../models/User';
+import { OTPReason } from '../enum';
+import { passwordReset, verifyEmail, welcomeEmail } from '../utils/messages';
+import { UserRole } from '../enum';
+import { changePasswordSchema, loginSchema, registerSchema, resetPasswordSchema, updateProfileSchema, verifyOTPSchema } from '../validation/body';
 
 
 export const register = async (req: Request, res: Response) => {
-    let { email, phone, firstName, lastName, password, confirmPassword } = req.body;
+    const result = registerSchema.safeParse(req.body);
+
+    if (!result.success)
+        return res.status(400).json({
+            error: "Invalid input",
+            issues: result.error.format()
+        })
+
+
+    let { email, phone, firstName, lastName, password, confirmPassword } = result.data;
 
     if (password !== confirmPassword) {
         return handleResponse(res, 400, false, 'Password does not match')
@@ -30,24 +40,17 @@ export const register = async (req: Request, res: Response) => {
 
         let hashPassword = await bcrypt.hash(password, 10);
 
-        //user id
-        const userId = `00${getRandom(7)}`;
 
         const user = await User.create({
             email,
-            userId,
             phone,
+            firstname: firstName,
+            lastname: lastName,
             password: hashPassword,
-            role: UserRole.USER
+            role: UserRole.VIEWER
         })
 
         user.password = undefined;
-
-        const profile = await Profile.create({
-            firstName,
-            lastName,
-            userId: user.id
-        })
 
         let otp = getRandom(6).toString();
 
@@ -57,12 +60,13 @@ export const register = async (req: Request, res: Response) => {
 
         let emailSendStatus: boolean
 
+        let emailToSend = welcomeEmail(otp);
 
         let messageId = await sendEmail(
             email,
-            welcomeEmail(otp).subject,
-            welcomeEmail(otp).body,
-            profile.firstName
+            emailToSend.subject,
+            emailToSend.body,
+            user.firstname
         )
 
         emailSendStatus = Boolean(messageId);
@@ -71,49 +75,21 @@ export const register = async (req: Request, res: Response) => {
             user, emailSendStatus
         })
     } catch (error: any) {
+        console.log(error)
         return handleResponse(res, 500, false, 'An error occurred', error)
-    }
-}
-
-
-export const register2 = async (req: Request, res: Response) => {
-    const { id, role } = req.user;
-
-    const { otherNames, dateOfBirth, address, description, privacy, postCode, category } = req.body;
-
-    if (!dateOfBirth || !address || !privacy || !postCode || !category)
-        return handleResponse(res, 400, false, 'Please provide all required fields')
-
-
-    try {
-        let updated = await Profile.update({
-            otherNames,
-            dateOfBirth,
-            address,
-            description,
-            privacy,
-            postCode,
-            category,
-        }, {
-            where: {
-                userId: id
-            }
-        });
-
-
-
-        return handleResponse(res, 200, true, 'Profile updated successfully', updated)
-    } catch (error: any) {
-        return handleResponse(res, 500, false, error.message)
     }
 }
 
 
 
 export const login = async (req: Request, res: Response) => {
-    let { email, password } = req.body;
+    let result = loginSchema.safeParse(req.body)
 
-    if (!email || !password) return handleResponse(res, 400, false, 'Please provide email and password')
+    if (!result.success) {
+        return res.status(400).json({ errors: result.error.flatten() });
+    }
+
+    let { email, password } = result.data;
 
     try {
         let user = await User.findOne({ where: { email } })
@@ -126,6 +102,8 @@ export const login = async (req: Request, res: Response) => {
 
         user.password = undefined;
 
+        if (!user.emailVerified) return handleResponse(res, 401, false, 'Please verify your email')
+
         let token = sign({ id: user.id, email: user.email, role: user.role }, config.TOKEN_SECRET);
 
         return successResponse(res, 'Login successful', {
@@ -133,6 +111,100 @@ export const login = async (req: Request, res: Response) => {
             token: token
         })
     } catch (error) {
+        console.log(error)
+        return errorResponse(res, 'error', error)
+    }
+}
+
+
+export const updateProfile = async (req: Request, res: Response) => {
+    const result = updateProfileSchema.safeParse(req.body);
+
+    if (!result.success) {
+        return res.status(400).json({ errors: result.error.flatten() });
+    }
+
+    try {
+        const updated = await User.update(result.data, {
+            where: { id: req.user.id }
+        })
+
+        return successResponse(res, 'Profile updated successfully', {
+
+        })
+    } catch (error) {
+        console.log(error)
+        return errorResponse(res, 'error', error)
+    }
+}
+
+
+export const changePassword = async (req: Request, res: Response) => {
+    const result = changePasswordSchema.safeParse(req.body);
+
+    if (!result.success) {
+        return res.status(400).json({ errors: result.error.flatten() });
+    }
+
+    const { oldPassword, newPassword } = result.data
+
+    try {
+        const user = await User.findOne({
+            where: { id: req.user.id }
+        })
+        if (!user) {
+            return handleResponse(res, 404, false, 'User not found')
+        }
+
+        const match = await bcrypt.compare(oldPassword, user.password || '')
+
+        if (!match) {
+            return handleResponse(res, 400, false, 'Old password does not match')
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10)
+
+        const updated = await User.update({ password: hashedPassword }, {
+            where: { id: req.user.id }
+        })
+
+        return successResponse(res, 'Password changed successfully')
+    } catch (error) {
+        console.log(error)
+        return errorResponse(res, 'error', error)
+    }
+}
+
+
+export const resetPassword = async (req: Request, res: Response) => {
+    const result = resetPasswordSchema.safeParse(req.body);
+
+    if (!result.success) {
+        return res.status(400).json({ errors: result.error.flatten() });
+    }
+
+    const { email, newPassword } = result.data
+
+    try {
+        const user = await User.findOne({
+            where: { email }
+        })
+
+        if (!user) {
+            return handleResponse(res, 404, false, 'User not found')
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10)
+
+        const updated = await User.update(
+            { password: hashedPassword },
+            {
+                where: { id: user.id }
+            })
+
+        return successResponse(res, 'Password reset successfully')
+    } catch (error) {
+        console.log(error)
         return errorResponse(res, 'error', error)
     }
 }
@@ -140,75 +212,92 @@ export const login = async (req: Request, res: Response) => {
 
 
 export const verifyOTP = async (req: Request, res: Response) => {
-    let { email, otp, reason } = req.body;
+    const result = verifyOTPSchema.safeParse(req.body);
 
-    let otpRecord = await OTP.findOne({ where: { email, otp } })
-
-    if (!otpRecord) return handleResponse(res, 404, false, 'OTP not found')
-
-    if (otpRecord.expiresAt < new Date()) {
-        otpRecord.destroy();
-        return handleResponse(res, 401, false, 'OTP expired')
+    if (!result.success) {
+        return res.status(400).json({ errors: result.error.flatten() });
     }
 
-    if (reason === OTPReason.VERIFY_EMAIL) {
-        let user = await User.findOne({ where: { email } })
 
-        if (!user) return handleResponse(res, 404, false, 'User not found')
+    let { email, otp, reason } = result.data;
 
-        user.emailVerified = true
+    try {
+        let otpRecord = await OTP.findOne({ where: { email, otp } })
 
-        await user.save()
+        if (!otpRecord) return handleResponse(res, 404, false, 'OTP not found')
+
+        if (otpRecord.expiresAt < new Date()) {
+            otpRecord.destroy();
+            return handleResponse(res, 401, false, 'OTP expired')
+        }
+
+        if (reason === OTPReason.VERIFY_EMAIL) {
+            let user = await User.findOne({ where: { email } })
+
+            if (!user) return handleResponse(res, 404, false, 'User not found')
+
+            user.emailVerified = true
+
+            await user.save()
+        }
+
+        await otpRecord.destroy();
+
+        return successResponse(res, 'OTP verified')
+    } catch (error) {
+        console.log(error)
+        return errorResponse(res, 'error', error)
     }
-
-    await otpRecord.destroy();
-
-    return successResponse(res, 'OTP verified')
 }
 
 
 
 export const sendOTP = async (req: Request, res: Response) => {
-    let { email, reason } = req.body;
+    try {
+        let { email, reason } = req.body;
 
-    let user = await User.findOne({ where: { email } })
+        let user = await User.findOne({ where: { email } })
 
-    if (!user) return handleResponse(res, 404, false, 'User not found')
+        if (!user) return handleResponse(res, 404, false, 'User not found')
 
-    let otp = getRandom(6).toString();
+        let otp = getRandom(6).toString();
 
-    let otpExpires = new Date(Date.now() + config.OTP_EXPIRY_TIME * 60 * 1000);
+        let otpExpires = new Date(Date.now() + config.OTP_EXPIRY_TIME * 60 * 1000);
 
-    let otpRecord = await OTP.create({ email, otp, expiresAt: otpExpires })
+        let otpRecord = await OTP.create({ email, otp, expiresAt: otpExpires })
 
-    let emailSendStatus
+        let emailSendStatus
 
-    if (reason === OTPReason.FORGOT_PASSWORD) {
-        let resetEmail = passwordReset(otp)
+        if (reason === OTPReason.FORGOT_PASSWORD) {
+            let resetEmail = passwordReset(otp)
 
-        let messageId = await sendEmail(
-            email,
-            resetEmail.subject,
-            resetEmail.body,
-            'User'
-        )
+            let messageId = await sendEmail(
+                email,
+                resetEmail.subject,
+                resetEmail.body,
+                'User'
+            )
 
-        emailSendStatus = Boolean(messageId);
-    } else if (reason === OTPReason.VERIFY_EMAIL) {
-        let emailSent = verifyEmail(otp)
+            emailSendStatus = Boolean(messageId);
+        } else if (reason === OTPReason.VERIFY_EMAIL) {
+            let emailSent = verifyEmail(otp)
 
-        let messageId = await sendEmail(
-            email,
-            emailSent.subject,
-            emailSent.body,
-            'User'
-        )
+            let messageId = await sendEmail(
+                email,
+                emailSent.subject,
+                emailSent.body,
+                'User'
+            )
 
-        emailSendStatus = Boolean(messageId);
+            emailSendStatus = Boolean(messageId);
+        }
+
+
+        return successResponse(res, 'OTP sent', { emailSendStatus })
+    } catch (error) {
+        console.log(error)
+        return errorResponse(res, 'Error sending OTP', error)
     }
-
-
-    return successResponse(res, 'OTP sent', { emailSendStatus })
 }
 
 export const me = async (req: Request, res: Response) => {
@@ -221,11 +310,8 @@ export const me = async (req: Request, res: Response) => {
             },
 
             include: [{
-                model: Profile,
-                as: 'profile'
-            }, {
-                model: Post,
-                as: 'posts',
+                model: Video,
+                as: 'videos',
             }, {
                 model: User,
                 as: 'followings',

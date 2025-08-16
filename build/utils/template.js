@@ -43,13 +43,13 @@ const templateData = (body, username) => {
       .email-body h1, .email-body h2 {
         font-size: 22px;
         margin-bottom: 20px;
-        color: #FF6600; /* Same as footer color for consistency */
+        color: #FF3D00; /* Same as footer color for consistency */
       }
       .email-body p {
         margin-bottom: 20px;
       }
       .email-footer {
-        background-color: #FF6600;
+        background-color: #FF3D00;
         color: #ffffff;
         text-align: center;
         padding: 20px;
@@ -116,7 +116,7 @@ const templateData = (body, username) => {
       <!-- Footer Section -->
       <div class="email-footer">
         <p>
-          © 2025 Brosip. All rights reserved.<br />
+          © 2025 Tastetorial. All rights reserved.<br />
           <a href="https://opulentconnectionsapp.com/privacy-policy"
             >Privacy Policy</a
           > | <a href="https://opulentconnectionsapp.com/terms">Terms of Service</a>

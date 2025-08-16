@@ -8,120 +8,33 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const User_1 = require("../models/User");
-module.exports = {
+const faker_1 = require("@faker-js/faker");
+const bcryptjs_1 = require("bcryptjs");
+const roles = ['viewer', 'creator', 'admin'];
+exports.default = {
     up: (queryInterface) => __awaiter(void 0, void 0, void 0, function* () {
-        const saltRounds = 10;
-        const users = [
-            {
-                email: 'admin@example.com',
-                phone: '1234567890',
-                password: yield bcryptjs_1.default.hash('password123', saltRounds),
-                status: User_1.UserStatus.ACTIVE,
-                state: User_1.UserState.VERIFIED,
-                role: User_1.UserRole.ADMIN,
+        const users = [];
+        for (let i = 0; i < 10; i++) {
+            users.push({
+                email: faker_1.faker.internet.email(),
+                emailVerified: faker_1.faker.datatype.boolean(),
+                phone: '080' + faker_1.faker.string.numeric(7),
+                username: faker_1.faker.internet.userName(),
+                firstname: faker_1.faker.person.firstName(),
+                lastname: faker_1.faker.person.lastName(),
+                birthday: faker_1.faker.date.birthdate({ min: 1980, max: 2005, mode: 'year' }),
+                status: 'ACTIVE', // change if you have other statuses
+                password: (0, bcryptjs_1.hashSync)('password123', 10),
+                role: roles[Math.floor(Math.random() * roles.length)], // change if you have other roles
+                deviceToken: faker_1.faker.datatype.boolean() ? faker_1.faker.string.uuid() : null,
                 createdAt: new Date(),
                 updatedAt: new Date(),
-            },
-            {
-                email: 'seeker1@example.com',
-                phone: '0987654321',
-                password: yield bcryptjs_1.default.hash('password123', saltRounds),
-                status: User_1.UserStatus.ACTIVE,
-                state: User_1.UserState.STEP_TWO,
-                role: User_1.UserRole.SEEKER,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            },
-            {
-                email: 'seeker2@example.com',
-                phone: '0987654322',
-                password: yield bcryptjs_1.default.hash('password123', saltRounds),
-                status: User_1.UserStatus.SUSPENDED,
-                state: User_1.UserState.STEP_THREE,
-                role: User_1.UserRole.SEEKER,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            },
-            {
-                email: 'provider1@example.com',
-                phone: '1122334455',
-                password: yield bcryptjs_1.default.hash('password123', saltRounds),
-                status: User_1.UserStatus.INACTIVE,
-                state: User_1.UserState.STEP_ONE,
-                role: User_1.UserRole.PROVIDER,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            },
-            {
-                email: 'provider2@example.com',
-                phone: '1122334456',
-                password: yield bcryptjs_1.default.hash('password123', saltRounds),
-                status: User_1.UserStatus.ACTIVE,
-                state: User_1.UserState.VERIFIED,
-                role: User_1.UserRole.PROVIDER,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            },
-            {
-                email: 'centre1@example.com',
-                phone: '2233445566',
-                password: yield bcryptjs_1.default.hash('password123', saltRounds),
-                status: User_1.UserStatus.ACTIVE,
-                state: User_1.UserState.STEP_TWO,
-                role: User_1.UserRole.CENTRE,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            },
-            {
-                email: 'centre2@example.com',
-                phone: '2233445567',
-                password: yield bcryptjs_1.default.hash('password123', saltRounds),
-                status: User_1.UserStatus.INACTIVE,
-                state: User_1.UserState.STEP_ONE,
-                role: User_1.UserRole.CENTRE,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            },
-            {
-                email: 'admin2@example.com',
-                phone: '3344556677',
-                password: yield bcryptjs_1.default.hash('password123', saltRounds),
-                status: User_1.UserStatus.ACTIVE,
-                state: User_1.UserState.VERIFIED,
-                role: User_1.UserRole.ADMIN,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            },
-            {
-                email: 'seeker3@example.com',
-                phone: '4455667788',
-                password: yield bcryptjs_1.default.hash('password123', saltRounds),
-                status: User_1.UserStatus.ACTIVE,
-                state: User_1.UserState.STEP_ONE,
-                role: User_1.UserRole.SEEKER,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            },
-            {
-                email: 'provider3@example.com',
-                phone: '5566778899',
-                password: yield bcryptjs_1.default.hash('password123', saltRounds),
-                status: User_1.UserStatus.SUSPENDED,
-                state: User_1.UserState.STEP_THREE,
-                role: User_1.UserRole.PROVIDER,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            }
-        ];
-        yield queryInterface.bulkInsert('users', users);
+            });
+        }
+        yield queryInterface.bulkInsert('user', users);
     }),
     down: (queryInterface) => __awaiter(void 0, void 0, void 0, function* () {
-        yield queryInterface.bulkDelete('users', {});
+        yield queryInterface.bulkDelete('user', {});
     }),
 };

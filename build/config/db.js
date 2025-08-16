@@ -42,17 +42,18 @@ const models = __importStar(require("../models/Models"));
 const sequelize = new sequelize_typescript_1.Sequelize({
     dialect: 'mssql',
     host: configSetup_1.default.DBHOST,
-    port: configSetup_1.default.DBPORT,
+    port: Number(configSetup_1.default.DBPORT),
     username: configSetup_1.default.DBUSERNAME,
-    password: configSetup_1.default.DBPASSWORD,
+    password: configSetup_1.default.DBPASSWORD || undefined,
     database: configSetup_1.default.DBNAME,
     models: Object.values(models),
     dialectOptions: {
         options: {
             encrypt: true,
-            trustServerCertificate: false,
+            trustServerCertificate: true,
         },
     },
+    logging: false,
 });
 // console.log('DB_CONNECTION_STRING:', config.DB_CONNECTION_STRING);
 // const sequelize = new Sequelize(

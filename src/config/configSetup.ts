@@ -13,7 +13,7 @@ type Config = {
     DBPORT: number | undefined;
     DBDIALECT: string | undefined;
     AZURE_STORAGE_CONNECTION_STRING: string | undefined;
-    // DB_CONNECTION_STRING: string | undefined;
+    DB_CONNECTION_STRING: string | undefined;
     PUBLIC_ROUTES: string[] | [];
     EMAIL_SERVICE: string | undefined;
     EMAIL_HOST: string | undefined;
@@ -36,7 +36,7 @@ const getConfig = (): Config => {
         DBPORT: Number(process.env.DBPORT),
         DBDIALECT: process.env.DBDIALECT,
         AZURE_STORAGE_CONNECTION_STRING: process.env.AZURE_STORAGE_CONNECTION_STRING,
-        // DB_CONNECTION_STRING: process.env.DB_CONNECTION_STRING,
+        DB_CONNECTION_STRING: process.env.DB_CONNECTION_STRING,
         TOKEN_SECRET: process.env.TOKEN_SECRET || 'supersecret',
         EMAIL_HOST: process.env.EMAIL_HOST,
         EMAIL_PASS: process.env.EMAIL_PASS,

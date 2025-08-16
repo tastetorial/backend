@@ -47,7 +47,7 @@ const getConfig = () => {
         DBPORT: Number(process.env.DBPORT),
         DBDIALECT: process.env.DBDIALECT,
         AZURE_STORAGE_CONNECTION_STRING: process.env.AZURE_STORAGE_CONNECTION_STRING,
-        // DB_CONNECTION_STRING: process.env.DB_CONNECTION_STRING,
+        DB_CONNECTION_STRING: process.env.DB_CONNECTION_STRING,
         TOKEN_SECRET: process.env.TOKEN_SECRET || 'supersecret',
         EMAIL_HOST: process.env.EMAIL_HOST,
         EMAIL_PASS: process.env.EMAIL_PASS,

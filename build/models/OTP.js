@@ -9,20 +9,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OTP = exports.OTPReason = exports.OTPType = void 0;
+exports.OTP = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
-var OTPType;
-(function (OTPType) {
-    OTPType["EMAIL"] = "email";
-    OTPType["PHONE"] = "phone";
-})(OTPType || (exports.OTPType = OTPType = {}));
-var OTPReason;
-(function (OTPReason) {
-    OTPReason["FORGOT_PASSWORD"] = "forgot_password";
-    OTPReason["VERIFY_EMAIL"] = "verify_email";
-    OTPReason["VERIFY_PHONE"] = "verify_phone";
-    OTPReason["CHANGE_EMAIL"] = "change_email";
-})(OTPReason || (exports.OTPReason = OTPReason = {}));
 let OTP = class OTP extends sequelize_typescript_1.Model {
 };
 exports.OTP = OTP;
@@ -49,5 +37,5 @@ __decorate([
     __metadata("design:type", Boolean)
 ], OTP.prototype, "isVerified", void 0);
 exports.OTP = OTP = __decorate([
-    (0, sequelize_typescript_1.Table)({ timestamps: false, tableName: 'otps' })
+    (0, sequelize_typescript_1.Table)({ timestamps: false, tableName: 'otp' })
 ], OTP);

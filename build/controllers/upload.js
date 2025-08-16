@@ -9,36 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.uploadAvatar = exports.uploadFile = exports.uploadFiles = void 0;
+exports.uploadFile = void 0;
 const modules_1 = require("../utils/modules");
 const uploadCloud_1 = require("../utils/uploadCloud");
-// const BASE_FOLDER = 'uploads'
-var StorageContainer;
-(function (StorageContainer) {
-    StorageContainer["PROFILE"] = "profile-pics";
-    StorageContainer["GENERAL"] = "general-pics";
-})(StorageContainer || (StorageContainer = {}));
-const uploadFiles = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!req.files) {
-        return (0, modules_1.handleResponse)(res, 404, false, 'No files uploaded');
-    }
-    const files = req.files;
-    const filesModified = files.map((file) => {
-        return {
-            buffer: file.buffer,
-            name: Date.now() + "--" + file.originalname,
-            mimetype: file.mimetype,
-        };
-    });
-    try {
-        const paths = yield (0, uploadCloud_1.uploadFilesToBlob)(StorageContainer.GENERAL, filesModified);
-        return (0, modules_1.successResponse)(res, 'success', { urls: paths });
-    }
-    catch (error) {
-        return (0, modules_1.handleResponse)(res, 500, false, 'Error uploading files');
-    }
-});
-exports.uploadFiles = uploadFiles;
+const uuid_1 = require("uuid");
 const uploadFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.file) {
         return (0, modules_1.handleResponse)(res, 404, false, 'No file uploaded');
@@ -46,12 +20,12 @@ const uploadFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     const file = req.file;
     const fileModified = {
         buffer: file.buffer,
-        name: Date.now() + "--" + file.originalname,
+        name: (0, uuid_1.v4)() + '.' + file.mimetype.split('/')[1],
         mimetype: file.mimetype,
     };
     console.log('filename', fileModified.name);
     try {
-        const path = yield (0, uploadCloud_1.uploadFileToBlob)(StorageContainer.GENERAL, fileModified);
+        const path = yield (0, uploadCloud_1.uploadFileToBlob)(file.fieldname, fileModified);
         return (0, modules_1.successResponse)(res, 'success', { url: path });
     }
     catch (error) {
@@ -59,22 +33,3 @@ const uploadFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.uploadFile = uploadFile;
-const uploadAvatar = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!req.file) {
-        return (0, modules_1.handleResponse)(res, 404, false, 'No file uploaded');
-    }
-    const file = req.file;
-    const fileModified = {
-        buffer: file.buffer,
-        name: Date.now() + "--" + file.originalname,
-        mimetype: file.mimetype,
-    };
-    try {
-        const path = yield (0, uploadCloud_1.uploadFileToBlob)(StorageContainer.PROFILE, fileModified);
-        return (0, modules_1.successResponse)(res, 'success', { url: path });
-    }
-    catch (error) {
-        return (0, modules_1.handleResponse)(res, 500, false, 'Error uploading file');
-    }
-});
-exports.uploadAvatar = uploadAvatar;

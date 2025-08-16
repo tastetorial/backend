@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.welcomeEmail = exports.verifyEmail = exports.registerEmail = exports.passwordReset = void 0;
+exports.welcomeEmail = exports.verifyEmail = exports.passwordReset = void 0;
 const configSetup_1 = __importDefault(require("../config/configSetup"));
 const passwordReset = (otp) => {
     return {
@@ -16,15 +16,6 @@ const passwordReset = (otp) => {
     };
 };
 exports.passwordReset = passwordReset;
-const registerEmail = (otp) => {
-    return {
-        subject: "Welcome to Westacare",
-        body: `<p>You are welcome to Westacare App</p>
-        <p>Use this OTP to complete your registration: <h2>${otp}</h2></p>
-        `
-    };
-};
-exports.registerEmail = registerEmail;
 const verifyEmail = (otp) => {
     return {
         subject: "Verify your email",
@@ -38,9 +29,9 @@ const verifyEmail = (otp) => {
 exports.verifyEmail = verifyEmail;
 const welcomeEmail = (otp) => {
     return {
-        subject: "Welcome to Brosip",
+        subject: "Welcome to Tastetorial",
         body: `
-    <p>You are welcome to Brosip App</p>
+    <p>You are welcome to Tastetorial App</p>
     <p>Use this OTP to verify our account</p>
     <h1 style="text-align: center">${otp}</h1>
     `

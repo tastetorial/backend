@@ -1,31 +1,12 @@
 import { Table, Model, Column, DataType, HasOne, BelongsToMany, HasMany, AllowNull, Unique, Default, Index, BelongsTo, ForeignKey, PrimaryKey, AutoIncrement } from 'sequelize-typescript';
-import { Profile } from './Models';
-import { Post } from './Post';
 import { Follow } from './Follow';
-import { Reaction } from './Reaction';
-
-export enum UserRole {
-    ADMIN = "admin",
-    USER = "user"
-}
-
-export enum UserStatus {
-    ACTIVE = 'ACTIVE',
-    INACTIVE = 'INACTIVE',
-    SUSPENDED = 'SUSPENDED',
-}
+import { UserRole, UserStatus } from '../enum';
+import { Video } from './Video';
 
 
 
-export enum UserState {
-    STEP_ONE = 'STEP_ONE',
-    STEP_TWO = 'STEP_TWO',
-    STEP_THREE = 'STEP_THREE',
-    VERIFIED = 'VERIFIED',
-}
 
-
-@Table({ timestamps: true, tableName: 'users' })
+@Table({ timestamps: true, tableName: 'user' })
 export class User extends Model {
     @PrimaryKey
     @AutoIncrement
@@ -33,15 +14,12 @@ export class User extends Model {
     id!: number;
 
 
-    @Unique
-    @Column(DataType.CHAR(9))
-    userId!: string;
-
 
     @AllowNull(false)
     @Unique
     @Column(DataType.STRING(50))
     email!: string;
+
 
 
     @AllowNull(false)
@@ -58,15 +36,34 @@ export class User extends Model {
 
 
 
+    @AllowNull(true)
+    @Unique
+    @Column(DataType.STRING(20))
+    username!: string;
+
+
+
+    @AllowNull(true)
+    @Column(DataType.STRING(100))
+    firstname!: string;
+
+
+
+    @AllowNull(true)
+    @Column(DataType.STRING(100))
+    lastname!: string;
+
+
+
+    @AllowNull(true)
+    @Column(DataType.DATEONLY)
+    birthday!: Date;
+
+
+
     @Default(UserStatus.ACTIVE)
     @Column(DataType.ENUM(...Object.values(UserStatus)))
     status!: UserStatus;
-
-
-
-    @Default(UserState.STEP_TWO)
-    @Column(DataType.ENUM(...Object.values(UserState)))
-    state!: UserState;
 
 
 
@@ -75,9 +72,10 @@ export class User extends Model {
     password!: string | undefined;
 
 
-    @Default(UserRole.USER)
-    @Column(DataType.ENUM(UserRole.ADMIN, UserRole.USER))
-    role!: string;
+
+    @Default(UserRole.VIEWER)
+    @Column(DataType.ENUM(...Object.values(UserRole)))
+    role!: UserRole;
 
 
 
@@ -86,12 +84,10 @@ export class User extends Model {
     deviceToken!: string;
 
 
-    @HasMany(() => Post, 'userId')
-    posts!: Post[]
 
+    @HasMany(() => Video)
+    videos!: Video[]
 
-    @HasOne(() => Profile, 'userId')
-    profile!: Profile
 
 
     @BelongsToMany(() => User, () => Follow, 'followingId', 'followerId')
@@ -100,8 +96,4 @@ export class User extends Model {
 
     @BelongsToMany(() => User, () => Follow, 'followerId', 'followingId')
     followings!: User[]
-
-
-    // @HasMany(() => Reaction, 'userId')
-    // reactions!: Reaction[];
 }

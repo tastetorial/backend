@@ -22,15 +22,6 @@ export const passwordReset = (otp: string): Message => {
     }
 }
 
-export const registerEmail = (otp: string): Message => {
-    return {
-        subject: "Welcome to Westacare",
-        body:
-            `<p>You are welcome to Westacare App</p>
-        <p>Use this OTP to complete your registration: <h2>${otp}</h2></p>
-        `
-    }
-}
 
 export const verifyEmail = (otp: string): Message => {
     return {
@@ -45,9 +36,9 @@ export const verifyEmail = (otp: string): Message => {
 
 export const welcomeEmail = (otp: string): Message => {
     return {
-        subject: "Welcome to Brosip",
+        subject: "Welcome to Tastetorial",
         body: `
-    <p>You are welcome to Brosip App</p>
+    <p>You are welcome to Tastetorial App</p>
     <p>Use this OTP to verify our account</p>
     <h1 style="text-align: center">${otp}</h1>
     `

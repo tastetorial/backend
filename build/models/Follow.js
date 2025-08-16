@@ -27,18 +27,18 @@ __decorate([
     __metadata("design:type", Number)
 ], Follow.prototype, "followingId", void 0);
 __decorate([
-    (0, sequelize_typescript_1.BelongsTo)(() => User_1.User, 'followingId'),
-    __metadata("design:type", User_1.User)
-], Follow.prototype, "following", void 0);
-__decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => User_1.User),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.BIGINT),
     __metadata("design:type", Number)
 ], Follow.prototype, "followerId", void 0);
 __decorate([
+    (0, sequelize_typescript_1.BelongsTo)(() => User_1.User, 'followingId'),
+    __metadata("design:type", User_1.User)
+], Follow.prototype, "following", void 0);
+__decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => User_1.User, 'followerId'),
     __metadata("design:type", User_1.User)
 ], Follow.prototype, "follower", void 0);
 exports.Follow = Follow = __decorate([
-    (0, sequelize_typescript_1.Table)({ timestamps: true, tableName: 'follows' })
+    (0, sequelize_typescript_1.Table)({ timestamps: true, tableName: 'follow' })
 ], Follow);

@@ -1,9 +1,11 @@
 {
-  "name": "brosip",
+  "name": "tastorial",
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "dev": "nodemon",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "npm run build && node ./build/app.js",
+    "build": "tsc --project ./",
     "start": "node ./build/app.js",
     "seed:db": "sequelize db:seed:all"
   },
@@ -26,12 +28,12 @@
   },
   "dependencies": {
     "@azure/storage-blob": "^12.27.0",
+    "@faker-js/faker": "^9.9.0",
     "@sequelize/mssql": "^7.0.0-alpha.46",
     "@types/nodemailer": "^6.4.17",
     "applicationinsights": "^3.7.0",
     "axios": "^1.8.4",
     "bcryptjs": "^3.0.2",
-    "cloudinary": "^2.5.1",
     "cors": "^2.8.5",
     "date-fns": "^4.1.0",
     "dotenv": "^16.5.0",
@@ -48,6 +50,7 @@
     "sequelize-cli-typescript": "^3.2.0-c",
     "sequelize-typescript": "^2.1.6",
     "tedious": "^19.0.0",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "zod": "^4.0.17"
   }
 }

@@ -1,14 +1,8 @@
 import { Table, Model, Column, DataType, HasOne, BelongsToMany, HasMany, AllowNull, Unique, Default, Index, BelongsTo, ForeignKey, PrimaryKey, AutoIncrement, Min, Max } from 'sequelize-typescript';
-import { View } from './View';
 import { User } from './User';
-import { Post } from './Post';
+import { Video } from './Video';
 
-export enum ReactionType {
-    LIKE = 'like',
-    RATING = 'rating'
-}
-
-@Table({ timestamps: true, tableName: 'reactions' })
+@Table({ timestamps: true, tableName: 'reaction' })
 export class Reaction extends Model {
     @PrimaryKey
     @AutoIncrement
@@ -17,24 +11,32 @@ export class Reaction extends Model {
 
 
     @AllowNull(false)
-    @Column(DataType.ENUM(...Object.values(ReactionType)))
-    type!: string
+    @Default(false)
+    @Column(DataType.BOOLEAN)
+    like!: boolean;
+
 
 
     @AllowNull(true)
-    @Min(1)
-    @Max(5)
-    @Column(DataType.TINYINT)
-    value!: number
+    @Column(DataType.TEXT)
+    comment!: string
 
-    @ForeignKey(() => Post)
+
+
+    @ForeignKey(() => Video)
     @AllowNull(false)
     @Column(DataType.BIGINT)
-    postId!: number;
+    videoId!: number;
+
 
 
     @ForeignKey(() => User)
     @AllowNull(false)
     @Column(DataType.BIGINT)
     userId!: number
+
+
+
+    @BelongsTo(() => User, 'userId')
+    user!: User;
 }
