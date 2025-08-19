@@ -3,6 +3,7 @@ import { Reaction } from "../models/Reaction";
 import { errorResponse, successResponse } from "../utils/modules";
 import { addCommentSchema } from "../validation/body";
 import { Op } from "sequelize";
+import { User } from "../models/User";
 
 export const toogleLike = async (req: Request, res: Response) => {
     const { id } = req.user;
@@ -67,7 +68,11 @@ export const getComments = async (req: Request, res: Response) => {
                     [Op.ne]: null
                 }
             },
-            attributes: ['comment', 'createdAt']
+            attributes: ['comment', 'createdAt'],
+            include: [{
+                model: User,
+                attributes: ['id', 'username', 'firstname', 'lastname', 'avatar']
+            }]
         })
 
         return successResponse(res, 'success', comments);

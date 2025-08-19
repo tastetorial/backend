@@ -14,6 +14,7 @@ const Reaction_1 = require("../models/Reaction");
 const modules_1 = require("../utils/modules");
 const body_1 = require("../validation/body");
 const sequelize_1 = require("sequelize");
+const User_1 = require("../models/User");
 const toogleLike = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.user;
     const { videoId } = req.params;
@@ -72,7 +73,11 @@ const getComments = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                     [sequelize_1.Op.ne]: null
                 }
             },
-            attributes: ['comment', 'createdAt']
+            attributes: ['comment', 'createdAt'],
+            include: [{
+                    model: User_1.User,
+                    attributes: ['id', 'username', 'firstname', 'lastname', 'avatar']
+                }]
         });
         return (0, modules_1.successResponse)(res, 'success', comments);
     }
