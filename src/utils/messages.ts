@@ -45,3 +45,23 @@ export const welcomeEmail = (otp: string): Message => {
     }
 }
 
+export const approvalEmail = (): Message => {
+    return {
+        subject: "Your creator profile has been approved",
+        body: `
+    <p>Congratulations! You have been approved as a <em>creator<em></p>
+    <p>Log into your account now to upload videos about any catering subject that is of interest to you.</p>
+    `
+    }
+}
+
+
+export const rejectionEmail = (): Message => {
+    return {
+        subject: "Your creator profile has been rejected",
+        body: `
+    <p>Sorry! Your creator profile has been rejected</p>
+    <p>Kindly contact the admin for more information</p>
+    `
+    }
+}

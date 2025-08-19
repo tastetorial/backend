@@ -22,6 +22,14 @@ export enum VideoStatus {
     ARCHIVED = 'archived'
 }
 
+export enum CreatorStatus {
+    PENDING = 'pending',
+    APPROVED = 'approved',
+    DECLINED = 'declined',
+    REVOKED = 'revoked',
+    SUSPENDED = 'suspended'
+}
+
 export enum OTPType {
     EMAIL = 'email',
     PHONE = 'phone'

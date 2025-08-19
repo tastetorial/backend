@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Creator = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
 const User_1 = require("./User");
+const enum_1 = require("../enum");
 let Creator = class Creator extends sequelize_typescript_1.Model {
 };
 exports.Creator = Creator;
@@ -26,6 +27,12 @@ __decorate([
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.TEXT),
     __metadata("design:type", String)
 ], Creator.prototype, "bio", void 0);
+__decorate([
+    (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.Default)(enum_1.CreatorStatus.PENDING),
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.ENUM(...Object.values(enum_1.CreatorStatus))),
+    __metadata("design:type", String)
+], Creator.prototype, "status", void 0);
 __decorate([
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.BIGINT),

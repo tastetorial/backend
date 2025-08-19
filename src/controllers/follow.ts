@@ -51,14 +51,16 @@ export const unfollow = async (req: Request, res: Response) => {
 
 // Check if a user is following another
 export const isFollowing = async (req: Request, res: Response) => {
-    const { followerId, followingId } = req.query;
+    const { id } = req.user;
+
+    const { followingId } = req.params;
 
     try {
         const follow = await Follow.findOne({
-            where: { followerId, followingId },
+            where: { followerId: id, followingId },
         });
 
-        return res.status(200).json({ following: !!follow });
+        return res.status(200).json({ following: Boolean(follow) });
     } catch (err) {
         return res.status(500).json({ message: 'Server error.' });
     }
@@ -66,11 +68,11 @@ export const isFollowing = async (req: Request, res: Response) => {
 
 // Get followers of a user
 export const getFollowers = async (req: Request, res: Response) => {
-    const { userId } = req.params;
+    const { id } = req.user;
 
     try {
         const followers = await Follow.findAll({
-            where: { followingId: userId },
+            where: { followingId: id },
             include: [{
                 model: User,
                 as: 'follower',
@@ -86,11 +88,11 @@ export const getFollowers = async (req: Request, res: Response) => {
 
 // Get who a user is following
 export const getFollowing = async (req: Request, res: Response) => {
-    const { userId } = req.params;
+    const { id } = req.user;
 
     try {
         const following = await Follow.findAll({
-            where: { followerId: userId },
+            where: { followerId: id },
             include: [{
                 model: User,
                 as: 'following',

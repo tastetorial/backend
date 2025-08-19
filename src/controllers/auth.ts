@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs'
 import { sendEmail } from '../services/email';
 import { sign } from 'jsonwebtoken';
 import config from '../config/configSetup'
-import { OTPReason } from '../enum';
+import { CreatorStatus, OTPReason } from '../enum';
 import { passwordReset, verifyEmail, welcomeEmail } from '../utils/messages';
 import { UserRole } from '../enum';
 import { changePasswordSchema, loginSchema, registerSchema, resetPasswordSchema, updateProfileSchema, verifyOTPSchema } from '../validation/body';
@@ -299,6 +299,7 @@ export const sendOTP = async (req: Request, res: Response) => {
         return errorResponse(res, 'Error sending OTP', error)
     }
 }
+
 
 export const me = async (req: Request, res: Response) => {
     const { id } = req.user;

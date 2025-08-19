@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Creator = exports.Category = exports.Follow = exports.Reaction = exports.Video = exports.OTP = exports.User = void 0;
+exports.VideoView = exports.Creator = exports.Category = exports.Follow = exports.Reaction = exports.Video = exports.OTP = exports.User = void 0;
 const User_1 = require("./User");
 Object.defineProperty(exports, "User", { enumerable: true, get: function () { return User_1.User; } });
 const OTP_1 = require("./OTP");
@@ -15,3 +15,5 @@ const Category_1 = require("./Category");
 Object.defineProperty(exports, "Category", { enumerable: true, get: function () { return Category_1.Category; } });
 const Creator_1 = require("./Creator");
 Object.defineProperty(exports, "Creator", { enumerable: true, get: function () { return Creator_1.Creator; } });
+const VideoView_1 = require("./VideoView");
+Object.defineProperty(exports, "VideoView", { enumerable: true, get: function () { return VideoView_1.VideoView; } });

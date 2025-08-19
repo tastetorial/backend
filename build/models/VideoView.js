@@ -9,50 +9,44 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Reaction = void 0;
+exports.VideoView = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
 const User_1 = require("./User");
 const Video_1 = require("./Video");
-let Reaction = class Reaction extends sequelize_typescript_1.Model {
+let VideoView = class VideoView extends sequelize_typescript_1.Model {
 };
-exports.Reaction = Reaction;
+exports.VideoView = VideoView;
 __decorate([
     sequelize_typescript_1.PrimaryKey,
     sequelize_typescript_1.AutoIncrement,
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.BIGINT),
     __metadata("design:type", Number)
-], Reaction.prototype, "id", void 0);
-__decorate([
-    (0, sequelize_typescript_1.AllowNull)(false),
-    (0, sequelize_typescript_1.Default)(false),
-    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.BOOLEAN),
-    __metadata("design:type", Boolean)
-], Reaction.prototype, "like", void 0);
-__decorate([
-    (0, sequelize_typescript_1.AllowNull)(true),
-    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.TEXT),
-    __metadata("design:type", Object)
-], Reaction.prototype, "comment", void 0);
+], VideoView.prototype, "id", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => Video_1.Video),
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.BIGINT),
     __metadata("design:type", Number)
-], Reaction.prototype, "videoId", void 0);
+], VideoView.prototype, "videoId", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => User_1.User),
     (0, sequelize_typescript_1.AllowNull)(false),
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.BIGINT),
     __metadata("design:type", Number)
-], Reaction.prototype, "userId", void 0);
+], VideoView.prototype, "userId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.AllowNull)(false),
+    (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.DATE),
+    __metadata("design:type", Date)
+], VideoView.prototype, "viewedAt", void 0);
 __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => User_1.User, 'userId'),
     __metadata("design:type", User_1.User)
-], Reaction.prototype, "user", void 0);
+], VideoView.prototype, "user", void 0);
 __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => Video_1.Video, 'videoId'),
     __metadata("design:type", Video_1.Video)
-], Reaction.prototype, "video", void 0);
-exports.Reaction = Reaction = __decorate([
-    (0, sequelize_typescript_1.Table)({ timestamps: true, tableName: 'reactions' })
-], Reaction);
+], VideoView.prototype, "video", void 0);
+exports.VideoView = VideoView = __decorate([
+    (0, sequelize_typescript_1.Table)({ timestamps: false, tableName: 'video_views' })
+], VideoView);

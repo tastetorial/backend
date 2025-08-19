@@ -2,25 +2,12 @@ import { Table, Model, Column, DataType, HasOne, BelongsToMany, HasMany, AllowNu
 import { User } from './User';
 import { Video } from './Video';
 
-@Table({ timestamps: true, tableName: 'reactions' })
-export class Reaction extends Model {
+@Table({ timestamps: false, tableName: 'video_views' })
+export class VideoView extends Model {
     @PrimaryKey
     @AutoIncrement
     @Column(DataType.BIGINT)
     id!: number;
-
-
-    @AllowNull(false)
-    @Default(false)
-    @Column(DataType.BOOLEAN)
-    like!: boolean;
-
-
-
-    @AllowNull(true)
-    @Column(DataType.TEXT)
-    comment!: string | null;
-
 
 
     @ForeignKey(() => Video)
@@ -35,6 +22,10 @@ export class Reaction extends Model {
     @Column(DataType.BIGINT)
     userId!: number
 
+
+    @AllowNull(false)
+    @Column(DataType.DATE)
+    viewedAt!: Date;
 
 
     @BelongsTo(() => User, 'userId')

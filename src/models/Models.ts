@@ -5,6 +5,7 @@ import { Reaction } from './Reaction'
 import { Follow } from './Follow'
 import { Category } from './Category'
 import { Creator } from './Creator'
+import { VideoView } from './VideoView'
 
 
 export {
@@ -14,5 +15,6 @@ export {
     Reaction,
     Follow,
     Category,
-    Creator
+    Creator,
+    VideoView
 }

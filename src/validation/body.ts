@@ -23,6 +23,10 @@ export const registerSchema = z.object({
     message: "Passwords do not match",
 });
 
+export const creatorSchema = z.object({
+    bio: z.string().min(10, { message: "Bio must be at least 10 characters" }),
+})
+
 
 export const loginSchema = z.object({
     email: z
@@ -84,3 +88,31 @@ export const resetPasswordSchema = z.object({
         .string()
         .min(6, { message: "New password must be at least 6 characters" }),
 })
+
+
+export const createVideoSchema = z.object({
+    title: z.string().min(1, 'Title is required'),
+    description: z.string().optional(),
+    tags: z.string().optional(),
+    categoryId: z.coerce.number('categoryId must be a number'),
+    thumbnailUrl: z.url('thumbnail must be a valid URL'),
+    videoUrl: z.url('video must be a valid URL'),
+    status: z.enum(['published', 'draft']).default('published')
+});
+
+
+export const updateVideoSchema = z.object({
+    title: z.string().min(1, 'Title is required').optional(),
+    description: z.string().optional(),
+    tags: z.string().optional(),
+    categoryId: z.coerce.number('categoryId must be a number').optional(),
+    thumbnailUrl: z.url('thumbnail must be a valid URL').optional(),
+    videoUrl: z.url('video must be a valid URL').optional(),
+    status: z.enum(['published', 'draft']).optional()
+})
+
+
+export const addCommentSchema = z.object({
+    videoId: z.coerce.number(),
+    comment: z.string().min(1, 'comment is required'),
+});

@@ -54,12 +54,13 @@ const unfollow = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.unfollow = unfollow;
 // Check if a user is following another
 const isFollowing = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { followerId, followingId } = req.query;
+    const { id } = req.user;
+    const { followingId } = req.params;
     try {
         const follow = yield Models_1.Follow.findOne({
-            where: { followerId, followingId },
+            where: { followerId: id, followingId },
         });
-        return res.status(200).json({ following: !!follow });
+        return res.status(200).json({ following: Boolean(follow) });
     }
     catch (err) {
         return res.status(500).json({ message: 'Server error.' });
@@ -68,10 +69,10 @@ const isFollowing = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 exports.isFollowing = isFollowing;
 // Get followers of a user
 const getFollowers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { userId } = req.params;
+    const { id } = req.user;
     try {
         const followers = yield Models_1.Follow.findAll({
-            where: { followingId: userId },
+            where: { followingId: id },
             include: [{
                     model: Models_1.User,
                     as: 'follower',
@@ -87,10 +88,10 @@ const getFollowers = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 exports.getFollowers = getFollowers;
 // Get who a user is following
 const getFollowing = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { userId } = req.params;
+    const { id } = req.user;
     try {
         const following = yield Models_1.Follow.findAll({
-            where: { followerId: userId },
+            where: { followerId: id },
             include: [{
                     model: Models_1.User,
                     as: 'following',

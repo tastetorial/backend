@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OTPReason = exports.OTPType = exports.VideoStatus = exports.ReactionType = exports.UserRole = exports.UserStatus = void 0;
+exports.OTPReason = exports.OTPType = exports.CreatorStatus = exports.VideoStatus = exports.ReactionType = exports.UserRole = exports.UserStatus = void 0;
 var UserStatus;
 (function (UserStatus) {
     UserStatus["ACTIVE"] = "ACTIVE";
@@ -24,6 +24,14 @@ var VideoStatus;
     VideoStatus["DRAFT"] = "draft";
     VideoStatus["ARCHIVED"] = "archived";
 })(VideoStatus || (exports.VideoStatus = VideoStatus = {}));
+var CreatorStatus;
+(function (CreatorStatus) {
+    CreatorStatus["PENDING"] = "pending";
+    CreatorStatus["APPROVED"] = "approved";
+    CreatorStatus["DECLINED"] = "declined";
+    CreatorStatus["REVOKED"] = "revoked";
+    CreatorStatus["SUSPENDED"] = "suspended";
+})(CreatorStatus || (exports.CreatorStatus = CreatorStatus = {}));
 var OTPType;
 (function (OTPType) {
     OTPType["EMAIL"] = "email";

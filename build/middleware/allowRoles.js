@@ -4,7 +4,7 @@ exports.allowRoles = void 0;
 const allowRoles = (...roles) => {
     return (req, res, next) => {
         const user = req.user;
-        if (user && roles.includes(user.role)) {
+        if (user && roles.includes(user.role) || roles.includes('*')) {
             next();
         }
         else {

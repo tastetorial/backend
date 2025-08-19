@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.welcomeEmail = exports.verifyEmail = exports.passwordReset = void 0;
+exports.rejectionEmail = exports.approvalEmail = exports.welcomeEmail = exports.verifyEmail = exports.passwordReset = void 0;
 const configSetup_1 = __importDefault(require("../config/configSetup"));
 const passwordReset = (otp) => {
     return {
@@ -38,3 +38,23 @@ const welcomeEmail = (otp) => {
     };
 };
 exports.welcomeEmail = welcomeEmail;
+const approvalEmail = () => {
+    return {
+        subject: "Your creator profile has been approved",
+        body: `
+    <p>Congratulations! You have been approved as a <em>creator<em></p>
+    <p>Log into your account now to upload videos about any catering subject that is of interest to you.</p>
+    `
+    };
+};
+exports.approvalEmail = approvalEmail;
+const rejectionEmail = () => {
+    return {
+        subject: "Your creator profile has been rejected",
+        body: `
+    <p>Sorry! Your creator profile has been rejected</p>
+    <p>Kindly contact the admin for more information</p>
+    `
+    };
+};
+exports.rejectionEmail = rejectionEmail;

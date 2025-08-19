@@ -1,101 +1,183 @@
-// import { Request, Response } from "express";
-// import { Reaction } from "../models/Models";
+import { Request, Response } from "express";
+import { Reaction } from "../models/Reaction";
+import { errorResponse, successResponse } from "../utils/modules";
+import { addCommentSchema } from "../validation/body";
+import { Op } from "sequelize";
 
-// export const createReaction = async (req: Request, res: Response) => {
-//     const userId = req.user.id;
+export const toogleLike = async (req: Request, res: Response) => {
+    const { id } = req.user;
 
-//     const { type, value, postId } = req.body;
+    const { videoId } = req.params;
 
-//     try {
-//         // If it's a rating, check if the user already rated this post
-//         if (type === 'rating') {
-//             const existing = await Reaction.findOne({
-//                 where: { postId, userId, type: 'rating' },
-//             });
+    try {
+        const [reaction, created] = await Reaction.findOrCreate({
+            where: {
+                videoId,
+                userId: id
+            }, defaults: {
+                like: true
+            }
+        })
 
-//             if (existing) {
-//                 // Update existing rating
-//                 existing.value = value;
-//                 await existing.save();
-//                 return res.status(200).json({ message: 'Rating updated', data: existing });
-//             }
-//         }
+        if (!created) {
+            reaction.like = !reaction.like;
+            if (!reaction.like && !reaction.comment) {
+                await reaction.destroy();
+            } else {
+                await reaction.save();
+            }
+        }
 
-//         // If it's a like, prevent duplicate likes
-//         if (type === 'like') {
-//             const existing = await Reaction.findOne({
-//                 where: { postId, userId, type: 'like' },
-//             });
+        return successResponse(res, 'success', reaction);
+    } catch (error) {
+        console.log(error);
+        return errorResponse(res, 'error', 'Something went wrong');
+    }
+}
 
-//             if (existing) {
-//                 return res.status(409).json({ message: 'Already liked' });
-//             }
-//         }
+export const isLiked = async (req: Request, res: Response) => {
+    const { id } = req.user;
 
-//         const reaction = await Reaction.create({ type, value, postId, userId });
+    const { videoId } = req.params;
 
-//         return res.status(201).json({ message: 'Reaction created', data: reaction });
-//     } catch (error) {
-//         console.error(error);
-//         return res.status(500).json({ message: 'Server error' });
-//     }
-// }
+    try {
+        const reaction = await Reaction.findOne({
+            where: {
+                videoId,
+                userId: id,
+                like: true
+            }
+        })
 
+        return successResponse(res, 'success', { liked: reaction ? true : false });
+    } catch (error) {
+        console.log(error);
+        return errorResponse(res, 'error', 'Something went wrong');
+    }
+}
 
-// export const deleteReaction = async (req: Request, res: Response) => {
-//     const userId = req.user.id;
+export const getComments = async (req: Request, res: Response) => {
+    const { videoId } = req.params;
 
-//     const { postId, type } = req.body;
+    try {
+        const comments = await Reaction.findAll({
+            where: {
+                videoId,
+                comment: {
+                    [Op.ne]: null
+                }
+            },
+            attributes: ['comment', 'createdAt']
+        })
 
-//     try {
-//         const reaction = await Reaction.findOne({
-//             where: { postId, userId, type },
-//         });
+        return successResponse(res, 'success', comments);
+    } catch (error) {
+        console.log(error);
+        return errorResponse(res, 'error', 'Something went wrong');
+    }
+}
 
-//         if (!reaction) {
-//             return res.status(404).json({ message: 'Reaction not found' });
-//         }
+export const addComment = async (req: Request, res: Response) => {
+    const { id } = req.user;
 
-//         await reaction.destroy();
+    const result = addCommentSchema.safeParse(req.body);
 
-//         return res.status(200).json({ message: 'Reaction removed' });
-//     } catch (error) {
-//         return res.status(500).json({ message: 'Server error' });
-//     }
-// }
+    if (!result.success) {
+        return res.status(400).json({
+            status: false,
+            message: 'validation error',
+            errors: result.error.format()
+        })
+    }
 
+    const { videoId, comment } = result.data;
 
-// export const getLikes = async (req: Request, res: Response) => {
-//     const { postId } = req.params;
+    try {
+        const [reaction, created] = await Reaction.findOrCreate({
+            where: {
+                videoId,
+                userId: id
+            }, defaults: {
+                comment
+            }
+        })
 
-//     try {
-//         const likes = await Reaction.findAll({
-//             where: { postId, type: 'like' },
-//         });
+        if (!created) {
+            reaction.comment = comment;
+            await reaction.save();
+        }
 
-//         return res.status(200).json({ likes });
-//     } catch (error) {
-//         return res.status(500).json({ message: 'Server error' });
-//     }
-// }
+        return successResponse(res, 'success', reaction);
+    } catch (error) {
+        console.log(error);
+        return errorResponse(res, 'error', 'Something went wrong');
+    }
+}
 
+export const editComment = async (req: Request, res: Response) => {
+    const { id } = req.user;
 
-// export const getAverageRating = async (req: Request, res: Response) => {
-//     const { postId } = req.params;
+    const result = addCommentSchema.safeParse(req.body);
 
-//     try {
-//         const result = await Reaction.findOne({
-//             attributes: [
-//                 [Reaction.sequelize!.fn('AVG', Reaction.sequelize!.col('value')), 'avgRating'],
-//             ],
-//             where: { postId, type: 'rating' },
-//             raw: true,
-//         }) as unknown as { avgRating: string | null };
+    if (!result.success) {
+        return res.status(400).json({
+            status: false,
+            message: 'validation error',
+            errors: result.error.format()
+        })
+    }
 
-//         const average = parseFloat(result?.avgRating || '0');
+    const { videoId, comment } = result.data;
 
-//         return res.status(200).json({ average });
-//     } catch (error) {
-//         return res.status(500).json({ message: 'Server error' });
-//     }
-// }
+    try {
+        const reaction = await Reaction.findOne({
+            where: {
+                videoId,
+                userId: id
+            }
+        })
+
+        if (!reaction) {
+            return errorResponse(res, 'error', 'Reaction not found');
+        }
+
+        reaction.comment = comment;
+        await reaction.save();
+
+        return successResponse(res, 'success', reaction);
+    } catch (error) {
+        console.log(error);
+        return errorResponse(res, 'error', 'Something went wrong');
+    }
+}
+
+export const deleteComment = async (req: Request, res: Response) => {
+    const { id } = req.user;
+
+    const { videoId } = req.params;
+
+    try {
+        const reaction = await Reaction.findOne({
+            where: {
+                videoId,
+                userId: id
+            }
+        })
+
+        if (!reaction) {
+            return errorResponse(res, 'error', 'Reaction not found');
+        }
+
+        if (reaction.like) {
+            reaction.comment = null;
+            await reaction.save();
+        } else {
+            await reaction.destroy();
+        }
+
+        return successResponse(res, 'success', 'Comment deleted');
+    } catch (error) {
+        console.log(error);
+        return errorResponse(res, 'error', 'Something went wrong');
+    }
+}
