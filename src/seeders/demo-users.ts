@@ -16,6 +16,7 @@ export default {
                 username: faker.internet.username(),
                 firstname: faker.person.firstName(),
                 lastname: faker.person.lastName(),
+                avatar: faker.image.avatar(),
                 birthday: faker.date.birthdate({ min: 1980, max: 2005, mode: 'year' }),
                 status: 'ACTIVE',          // change if you have other statuses
                 password: hashSync('password123', 10),

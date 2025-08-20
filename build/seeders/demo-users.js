@@ -23,6 +23,7 @@ exports.default = {
                 username: faker_1.faker.internet.username(),
                 firstname: faker_1.faker.person.firstName(),
                 lastname: faker_1.faker.person.lastName(),
+                avatar: faker_1.faker.image.avatar(),
                 birthday: faker_1.faker.date.birthdate({ min: 1980, max: 2005, mode: 'year' }),
                 status: 'ACTIVE', // change if you have other statuses
                 password: (0, bcryptjs_1.hashSync)('password123', 10),
