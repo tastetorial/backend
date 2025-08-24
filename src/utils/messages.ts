@@ -45,6 +45,17 @@ export const welcomeEmail = (otp: string): Message => {
     }
 }
 
+export const welcomeEmail2 = (link: string): Message => {
+    return {
+        subject: "Welcome to Tastetorial",
+        body: `
+    <p>You are welcome to Tastetorial App</p>
+    <p>Click this link to activate your account</p>
+    <a style="text-align: center; display: block; margin: 0 auto; text-decoration: none; color: #fff; background-color: #FF3D00; border-color: #FF3D00; padding: .375rem .75rem; font-size: 1rem; line-height: 1.5; border-radius: .25rem;" href="${link}">Activate Your Account</a>
+    `
+    }
+}
+
 export const approvalEmail = (): Message => {
     return {
         subject: "Your creator profile has been approved",

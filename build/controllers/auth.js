@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.me = exports.sendOTP = exports.verifyOTP = exports.resetPassword = exports.changePassword = exports.updateProfile = exports.login = exports.register = void 0;
+exports.me = exports.sendOTP = exports.verifyOTP = exports.resetPassword = exports.changePassword = exports.updateProfile = exports.login = exports.activateAccount = exports.register = void 0;
 const modules_1 = require("../utils/modules");
 const Models_1 = require("../models/Models");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
@@ -23,6 +23,8 @@ const enum_1 = require("../enum");
 const messages_1 = require("../utils/messages");
 const enum_2 = require("../enum");
 const body_1 = require("../validation/body");
+const sequelize_1 = require("sequelize");
+const crypto_1 = __importDefault(require("crypto"));
 const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = body_1.registerSchema.safeParse(req.body);
     if (!result.success)
@@ -30,7 +32,7 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             error: "Invalid input",
             issues: result.error.format()
         });
-    let { email, phone, firstName, lastName, password, confirmPassword } = result.data;
+    let { email, phone, firstname, lastname, password, confirmPassword } = result.data;
     if (password !== confirmPassword) {
         return (0, modules_1.handleResponse)(res, 400, false, 'Password does not match');
     }
@@ -38,7 +40,14 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         return (0, modules_1.handleResponse)(res, 400, false, 'Invalid email');
     }
     try {
-        let oldUser = yield Models_1.User.findOne({ where: { email: email } });
+        let oldUser = yield Models_1.User.findOne({
+            where: {
+                [sequelize_1.Op.or]: [
+                    { email: email },
+                    { phone: phone }
+                ]
+            }
+        });
         if (oldUser) {
             return (0, modules_1.handleResponse)(res, 400, false, 'User already exists');
         }
@@ -46,17 +55,19 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const user = yield Models_1.User.create({
             email,
             phone,
-            firstname: firstName,
-            lastname: lastName,
+            firstname: firstname,
+            username: firstname + (0, modules_1.randomId)(6),
+            lastname: lastname,
             password: hashPassword,
             role: enum_2.UserRole.VIEWER
         });
         user.password = undefined;
-        let otp = (0, modules_1.getRandom)(6).toString();
+        let otp = crypto_1.default.randomBytes(32).toString("hex");
         let otpExpires = new Date(Date.now() + configSetup_1.default.OTP_EXPIRY_TIME * 60 * 1000);
         let otpRecord = yield Models_1.OTP.create({ email, otp, expiresAt: otpExpires });
+        const activationLink = `${configSetup_1.default.CLIENT_URL}/auth_screen2.html?token=${otp}`;
         let emailSendStatus;
-        let emailToSend = (0, messages_1.welcomeEmail)(otp);
+        let emailToSend = (0, messages_1.welcomeEmail2)(activationLink);
         let messageId = yield (0, email_1.sendEmail)(email, emailToSend.subject, emailToSend.body, user.firstname);
         emailSendStatus = Boolean(messageId);
         return (0, modules_1.handleResponse)(res, 200, true, 'User registered successfully', {
@@ -65,10 +76,39 @@ const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
     catch (error) {
         console.log(error);
-        return (0, modules_1.handleResponse)(res, 500, false, 'An error occurred', error);
+        return (0, modules_1.errorResponse)(res, 'error', 'Internal server error');
     }
 });
 exports.register = register;
+const activateAccount = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { token } = req.query;
+    try {
+        const otp = yield Models_1.OTP.findOne({
+            where: {
+                otp: token,
+                expiresAt: { [sequelize_1.Op.gt]: new Date() }
+            }
+        });
+        if (!otp) {
+            return res.status(400).json({ message: "Invalid or expired token" });
+        }
+        const user = yield Models_1.User.findOne({
+            where: {
+                email: otp.email
+            }
+        });
+        if (!user) {
+            return res.status(400).json({ message: "User not found" });
+        }
+        user.emailVerified = true;
+        yield user.save();
+        return (0, modules_1.successResponse)(res, 'success', 'Account activated successfully');
+    }
+    catch (err) {
+        return (0, modules_1.errorResponse)(res, 'error', 'Internal server error');
+    }
+});
+exports.activateAccount = activateAccount;
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let result = body_1.loginSchema.safeParse(req.body);
     if (!result.success) {

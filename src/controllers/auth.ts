@@ -6,9 +6,11 @@ import { sendEmail } from '../services/email';
 import { sign } from 'jsonwebtoken';
 import config from '../config/configSetup'
 import { CreatorStatus, OTPReason } from '../enum';
-import { passwordReset, verifyEmail, welcomeEmail } from '../utils/messages';
+import { passwordReset, verifyEmail, welcomeEmail, welcomeEmail2 } from '../utils/messages';
 import { UserRole } from '../enum';
 import { changePasswordSchema, loginSchema, registerSchema, resetPasswordSchema, updateProfileSchema, verifyOTPSchema } from '../validation/body';
+import { Op } from 'sequelize';
+import crypto from "crypto";
 
 
 export const register = async (req: Request, res: Response) => {
@@ -21,7 +23,7 @@ export const register = async (req: Request, res: Response) => {
         })
 
 
-    let { email, phone, firstName, lastName, password, confirmPassword } = result.data;
+    let { email, phone, firstname, lastname, password, confirmPassword } = result.data;
 
     if (password !== confirmPassword) {
         return handleResponse(res, 400, false, 'Password does not match')
@@ -32,7 +34,14 @@ export const register = async (req: Request, res: Response) => {
     }
 
     try {
-        let oldUser = await User.findOne({ where: { email: email } });
+        let oldUser = await User.findOne({
+            where: {
+                [Op.or]: [
+                    { email: email },
+                    { phone: phone }
+                ]
+            }
+        });
 
         if (oldUser) {
             return handleResponse(res, 400, false, 'User already exists')
@@ -44,23 +53,27 @@ export const register = async (req: Request, res: Response) => {
         const user = await User.create({
             email,
             phone,
-            firstname: firstName,
-            lastname: lastName,
+            firstname: firstname,
+            username: firstname + randomId(6),
+            lastname: lastname,
             password: hashPassword,
             role: UserRole.VIEWER
         })
 
         user.password = undefined;
 
-        let otp = getRandom(6).toString();
+
+        let otp = crypto.randomBytes(32).toString("hex");
 
         let otpExpires = new Date(Date.now() + config.OTP_EXPIRY_TIME * 60 * 1000);
 
         let otpRecord = await OTP.create({ email, otp, expiresAt: otpExpires })
 
+        const activationLink = `${config.CLIENT_URL}/auth_screen2.html?token=${otp}`;
+
         let emailSendStatus: boolean
 
-        let emailToSend = welcomeEmail(otp);
+        let emailToSend = welcomeEmail2(activationLink);
 
         let messageId = await sendEmail(
             email,
@@ -76,9 +89,45 @@ export const register = async (req: Request, res: Response) => {
         })
     } catch (error: any) {
         console.log(error)
-        return handleResponse(res, 500, false, 'An error occurred', error)
+        return errorResponse(res, 'error', 'Internal server error')
     }
 }
+
+
+export const activateAccount = async (req: Request, res: Response) => {
+    const { token } = req.query;
+
+    try {
+        const otp = await OTP.findOne({
+            where: {
+                otp: token,
+                expiresAt: { [Op.gt]: new Date() }
+            }
+        });
+
+        if (!otp) {
+            return res.status(400).json({ message: "Invalid or expired token" });
+        }
+
+        const user = await User.findOne({
+            where: {
+                email: otp.email
+            }
+        })
+
+        if (!user) {
+            return res.status(400).json({ message: "User not found" });
+        }
+
+        user.emailVerified = true;
+
+        await user.save();
+
+        return successResponse(res, 'success', 'Account activated successfully');
+    } catch (err) {
+        return errorResponse(res, 'error', 'Internal server error');
+    }
+};
 
 
 

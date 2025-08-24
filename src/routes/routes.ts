@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-import { register, sendOTP, verifyOTP, login, me, resetPassword, changePassword, updateProfile } from "../controllers/auth";
+import { register, sendOTP, verifyOTP, login, me, resetPassword, changePassword, updateProfile, activateAccount } from "../controllers/auth";
 import { upload } from "../utils/upload";
 import { follow, getFollowers, getFollowing, isFollowing, unfollow } from "../controllers/follow";
 // import { createReaction, deleteReaction, getAverageRating, getLikes } from "../controllers/reaction";
@@ -11,8 +11,11 @@ import { allowRoles } from "../middleware/allowRoles";
 import { UserRole } from "../enum";
 import { approveCreator, getCreator, getCreators, rejectCreator, upgradeToCreator } from "../controllers/creator";
 import { addComment, deleteComment, editComment, getComments, isLiked, toogleLike } from '../controllers/reaction'
+import { getMySavedVideos, isSavedVideo, toggleSaveVideo } from "../controllers/saved";
+import { createCategory, deleteCategory, getCategories, updateCategory } from "../controllers/category";
 
 router.post('/auth/register', register)
+router.post("/auth/activate", activateAccount);
 router.post('/auth/send-otp', sendOTP)
 router.post('/auth/verify-otp', verifyOTP)
 router.post('/auth/login', login)
@@ -57,5 +60,14 @@ router.get('/comment/:videoId', getComments)
 router.post('/comment', addComment)
 router.put('/comment/', editComment)
 router.delete('/comment/:videoId', deleteComment)
+
+router.post('/toggle-save', toggleSaveVideo)
+router.get('/get-saved', getMySavedVideos)
+router.get('/is-saved/:videoId', isSavedVideo)
+
+router.get('/categories', getCategories);
+router.post('/categories', allowRoles(UserRole.ADMIN), createCategory);
+router.put('/categories/:id', allowRoles(UserRole.ADMIN), updateCategory);
+router.delete('/categories/:id', allowRoles(UserRole.ADMIN), deleteCategory);
 
 export default router;

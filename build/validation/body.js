@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addCommentSchema = exports.updateVideoSchema = exports.createVideoSchema = exports.resetPasswordSchema = exports.changePasswordSchema = exports.updateProfileSchema = exports.verifyOTPSchema = exports.loginSchema = exports.creatorSchema = exports.registerSchema = void 0;
+exports.updateCategorySchema = exports.addCategorySchema = exports.addCommentSchema = exports.updateVideoSchema = exports.createVideoSchema = exports.resetPasswordSchema = exports.changePasswordSchema = exports.updateProfileSchema = exports.verifyOTPSchema = exports.loginSchema = exports.creatorSchema = exports.registerSchema = void 0;
 const zod_1 = require("zod");
 const enum_1 = require("../enum");
 exports.registerSchema = zod_1.z.object({
@@ -9,10 +9,10 @@ exports.registerSchema = zod_1.z.object({
     phone: zod_1.z
         .string()
         .regex(/^\+?[0-9]{7,15}$/, { message: "Invalid phone number" }),
-    firstName: zod_1.z
+    firstname: zod_1.z
         .string()
         .min(2, { message: "First name must be at least 2 characters" }),
-    lastName: zod_1.z
+    lastname: zod_1.z
         .string()
         .min(2, { message: "Last name must be at least 2 characters" }),
     password: zod_1.z
@@ -98,4 +98,17 @@ exports.updateVideoSchema = zod_1.z.object({
 exports.addCommentSchema = zod_1.z.object({
     videoId: zod_1.z.coerce.number(),
     comment: zod_1.z.string().min(1, 'comment is required'),
+});
+exports.addCategorySchema = zod_1.z.object({
+    name: zod_1.z.string().min(1, "Name is required"),
+    description: zod_1.z.string().nullable().optional(),
+    image: zod_1.z.url("Image must be a valid URL").nullable().optional(),
+});
+exports.updateCategorySchema = zod_1.z.object({
+    name: zod_1.z.string().min(1, "Name is required").optional(),
+    description: zod_1.z.string().nullable().optional(),
+    image: zod_1.z.url("Image must be a valid URL").nullable().optional(),
+}).refine((data) => Object.keys(data).length > 0, {
+    message: "At least one field must be provided",
+    path: []
 });

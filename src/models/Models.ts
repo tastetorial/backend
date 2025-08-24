@@ -6,6 +6,7 @@ import { Follow } from './Follow'
 import { Category } from './Category'
 import { Creator } from './Creator'
 import { VideoView } from './VideoView'
+import { SavedVideo } from './SavedVideo'
 
 
 export {
@@ -16,5 +17,6 @@ export {
     Follow,
     Category,
     Creator,
-    VideoView
+    VideoView,
+    SavedVideo
 }

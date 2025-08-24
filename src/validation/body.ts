@@ -7,10 +7,10 @@ export const registerSchema = z.object({
     phone: z
         .string()
         .regex(/^\+?[0-9]{7,15}$/, { message: "Invalid phone number" }),
-    firstName: z
+    firstname: z
         .string()
         .min(2, { message: "First name must be at least 2 characters" }),
-    lastName: z
+    lastname: z
         .string()
         .min(2, { message: "Last name must be at least 2 characters" }),
     password: z
@@ -116,3 +116,22 @@ export const addCommentSchema = z.object({
     videoId: z.coerce.number(),
     comment: z.string().min(1, 'comment is required'),
 });
+
+export const addCategorySchema = z.object({
+    name: z.string().min(1, "Name is required"),
+    description: z.string().nullable().optional(),
+    image: z.url("Image must be a valid URL").nullable().optional(),
+});
+
+export const updateCategorySchema = z.object({
+    name: z.string().min(1, "Name is required").optional(),
+    description: z.string().nullable().optional(),
+    image: z.url("Image must be a valid URL").nullable().optional(),
+}).refine((data) => Object.keys(data).length > 0, {
+    message: "At least one field must be provided",
+    path: []
+});
+
+
+
+

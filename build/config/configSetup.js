@@ -39,6 +39,7 @@ const getConfig = () => {
     return {
         PORT: Number(process.env.PORT),
         NODE_ENV: process.env.NODE_ENV,
+        CLIENT_URL: process.env.CLIENT_URL,
         //JWT_EXPIRY_TIME: process.env.JWT_EXPIRY_TIME,
         DBNAME: process.env.DBNAME,
         DBUSERNAME: process.env.DBUSERNAME,
@@ -68,6 +69,7 @@ const getConfig = () => {
             '/api/auth/send-otp',
             '/api/auth/reset-password',
             '/api/auth/verify-token',
+            '/api/auth/activate'
         ]
     };
 };

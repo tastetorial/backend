@@ -25,3 +25,8 @@ export const getCreatorQuerySchema = z.object({
     status: z.enum(CreatorStatus).optional(),
     search: z.string().optional(),
 });
+
+export const pagination = z.object({
+    page: z.coerce.number().int().positive().default(1),
+    limit: z.coerce.number().int().positive().default(10),
+})

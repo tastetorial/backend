@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getCreatorQuerySchema = exports.myVideoQuerySchema = exports.videoQuerySchema = void 0;
+exports.pagination = exports.getCreatorQuerySchema = exports.myVideoQuerySchema = exports.videoQuerySchema = void 0;
 const zod_1 = require("zod");
 const enum_1 = require("../enum");
 exports.videoQuerySchema = zod_1.z.object({
@@ -23,4 +23,8 @@ exports.getCreatorQuerySchema = zod_1.z.object({
     limit: zod_1.z.coerce.number().int().positive().default(10),
     status: zod_1.z.enum(enum_1.CreatorStatus).optional(),
     search: zod_1.z.string().optional(),
+});
+exports.pagination = zod_1.z.object({
+    page: zod_1.z.coerce.number().int().positive().default(1),
+    limit: zod_1.z.coerce.number().int().positive().default(10),
 });
