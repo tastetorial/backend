@@ -2,10 +2,10 @@ import { Request, Response } from "express";
 import { Follow, User } from "../models/Models";
 import { errorResponse, successResponse } from "../utils/modules";
 
-export const follow = async (req: Request, res: Response) => {
+export const toggleFollow = async (req: Request, res: Response) => {
     const followerId = req.user.id;
 
-    const { followingId } = req.body;
+    const { followingId } = req.params;
 
     if (followerId === followingId) {
         return res.status(400).json({ message: "You can't follow yourself." });
@@ -17,10 +17,11 @@ export const follow = async (req: Request, res: Response) => {
         });
 
         if (!created) {
-            return res.status(409).json({ message: 'Already following.' });
+            await follow.destroy();
+            return successResponse(res, 'success', { following: false, message: 'Already following. Unfollowed now.' });
         }
 
-        return res.status(201).json({ message: 'Now following.', data: follow });
+        return successResponse(res, 'success', { following: true, message: 'Now following.' });
     } catch (err) {
         console.error(err);
         return res.status(500).json({ message: 'Server error.' });
@@ -60,9 +61,9 @@ export const isFollowing = async (req: Request, res: Response) => {
             where: { followerId: id, followingId },
         });
 
-        return res.status(200).json({ following: Boolean(follow) });
+        return successResponse(res, 'success', { following: Boolean(follow) });
     } catch (err) {
-        return res.status(500).json({ message: 'Server error.' });
+        return errorResponse(res, 'error', 'Internal server error');
     }
 }
 

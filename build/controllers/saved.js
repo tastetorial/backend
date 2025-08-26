@@ -70,7 +70,7 @@ const getMySavedVideos = (req, res) => __awaiter(void 0, void 0, void 0, functio
 });
 exports.getMySavedVideos = getMySavedVideos;
 const toggleSaveVideo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { videoId } = req.body;
+    const { videoId } = req.params;
     try {
         const savedVideo = yield SavedVideo_1.SavedVideo.findOne({
             where: {
@@ -80,13 +80,13 @@ const toggleSaveVideo = (req, res) => __awaiter(void 0, void 0, void 0, function
         });
         if (savedVideo) {
             yield savedVideo.destroy();
-            return (0, modules_1.successResponse)(res, 'success', { message: 'Video unsaved' });
+            return (0, modules_1.successResponse)(res, 'success', { saved: false, message: 'Removed from saved videos' });
         }
         const saved = SavedVideo_1.SavedVideo.create({
             userId: req.user.id,
             videoId
         });
-        return (0, modules_1.successResponse)(res, 'success', { message: 'Saved Video' });
+        return (0, modules_1.successResponse)(res, 'success', { saved: true, message: 'Video saved' });
     }
     catch (error) {
         console.log(error);
@@ -104,9 +104,9 @@ const isSavedVideo = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             }
         });
         if (savedVideo) {
-            return (0, modules_1.successResponse)(res, 'success', { isSaved: true });
+            return (0, modules_1.successResponse)(res, 'success', { saved: true });
         }
-        return (0, modules_1.successResponse)(res, 'success', { isSaved: false });
+        return (0, modules_1.successResponse)(res, 'success', { saved: false });
     }
     catch (error) {
         console.log(error);

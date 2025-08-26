@@ -23,6 +23,7 @@ type Config = {
     EMAIL_FROM: string | undefined,
     EMAIL_PASS: string | undefined;
     OTP_EXPIRY_TIME: number;
+    MAX_FILE_SIZE: number;
     APPINSIGHTS_INSTRUMENTATIONKEY: string | undefined;
 };
 
@@ -48,6 +49,7 @@ const getConfig = (): Config => {
         EMAIL_USER: process.env.EMAIL_USER,
         EMAIL_FROM: process.env.EMAIL_FROM,
         OTP_EXPIRY_TIME: Number(process.env.OTP_EXPIRY_TIME),
+        MAX_FILE_SIZE: Number(process.env.MAX_FILE_SIZE),
         APPINSIGHTS_INSTRUMENTATIONKEY: process.env.APPINSIGHTS_INSTRUMENTATIONKEY,
         PUBLIC_ROUTES: [
             '/',

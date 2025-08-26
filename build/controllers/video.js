@@ -145,23 +145,62 @@ const getVideo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const video = yield Models_1.Video.findOne({
             where: { id: videoId },
+            attributes: {
+                include: [
+                    [
+                        db_1.default.literal(`(
+                          SELECT COALESCE(SUM(CAST([like] AS INT)), 0)
+                          FROM reactions
+                          WHERE reactions.videoId = ${videoId}
+                        )`),
+                        'likes'
+                    ],
+                    [
+                        db_1.default.literal(`(
+                      SELECT COUNT([comment])
+                      FROM reactions
+                      WHERE reactions.videoId = ${videoId}
+                    )`),
+                        'comments'
+                    ]
+                ]
+            },
             include: [{
                     model: Models_1.Category,
                     attributes: { exclude: ['createdAt', 'updatedAt'] },
                 }, {
                     model: Models_1.User,
-                    attributes: ['id', 'username', 'firstname', 'lastname', 'email', 'avatar']
+                    attributes: [
+                        'id',
+                        'username',
+                        'firstname',
+                        'lastname',
+                        'email',
+                        'avatar',
+                    ],
+                    include: [{
+                            model: Models_1.Video,
+                            required: false,
+                            where: { id: { [sequelize_1.Op.ne]: videoId }, status: enum_1.VideoStatus.PUBLISHED },
+                            attributes: ['id', 'title', 'thumbnailUrl', 'videoUrl', 'views', 'createdAt'],
+                        }]
                 }, {
                     model: Models_1.Reaction,
                     where: { [sequelize_1.Op.not]: { comment: null } },
-                    attributes: ['id', 'comment', 'userId'],
+                    attributes: ['id', 'comment', 'userId', 'commentedAt'],
+                    required: false,
                     include: [{
                             model: Models_1.User,
-                            attributes: ['id', 'username', 'firstname', 'lastname', 'email', 'avatar']
+                            attributes: ['id', 'username', 'firstname', 'lastname', 'email', 'avatar'],
                         }]
                 }]
         });
-        return (0, modules_1.successResponse)(res, 'success', video);
+        if (!video) {
+            return (0, modules_1.handleResponse)(res, 404, false, 'Video not found');
+        }
+        const followersCount = yield Models_1.Follow.count({ where: { followingId: video.userId } });
+        const videoData = Object.assign(Object.assign({}, video.toJSON()), { creator: Object.assign(Object.assign({}, video.creator.toJSON()), { followers: followersCount }) });
+        return (0, modules_1.successResponse)(res, 'success', videoData);
     }
     catch (error) {
         console.log(error);

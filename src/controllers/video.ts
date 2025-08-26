@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Category, Reaction, User, Video, VideoView } from "../models/Models";
+import { Category, Follow, Reaction, User, Video, VideoView } from "../models/Models";
 import { errorResponse, handleResponse, successResponse } from "../utils/modules";
 import { Op, Sequelize } from "sequelize";
 import { VideoStatus } from "../enum";
@@ -160,24 +160,72 @@ export const getVideo = async (req: Request, res: Response) => {
     try {
         const video = await Video.findOne({
             where: { id: videoId },
+            attributes: {
+                include: [
+                    [
+                        sequelize.literal(`(
+                          SELECT COALESCE(SUM(CAST([like] AS INT)), 0)
+                          FROM reactions
+                          WHERE reactions.videoId = ${videoId}
+                        )`),
+                        'likes'
+                    ],
+                    [
+                        sequelize.literal(`(
+                      SELECT COUNT([comment])
+                      FROM reactions
+                      WHERE reactions.videoId = ${videoId}
+                    )`),
+                        'comments'
+                    ]
+                ]
+            },
             include: [{
                 model: Category,
                 attributes: { exclude: ['createdAt', 'updatedAt'] },
             }, {
                 model: User,
-                attributes: ['id', 'username', 'firstname', 'lastname', 'email', 'avatar']
+                attributes: [
+                    'id',
+                    'username',
+                    'firstname',
+                    'lastname',
+                    'email',
+                    'avatar',
+                ],
+                include: [{
+                    model: Video,
+                    required: false,
+                    where: { id: { [Op.ne]: videoId }, status: VideoStatus.PUBLISHED },
+                    attributes: ['id', 'title', 'thumbnailUrl', 'videoUrl', 'views', 'createdAt'],
+                }]
             }, {
                 model: Reaction,
                 where: { [Op.not]: { comment: null } },
-                attributes: ['id', 'comment', 'userId'],
+                attributes: ['id', 'comment', 'userId', 'commentedAt'],
+                required: false,
                 include: [{
                     model: User,
-                    attributes: ['id', 'username', 'firstname', 'lastname', 'email', 'avatar']
+                    attributes: ['id', 'username', 'firstname', 'lastname', 'email', 'avatar'],
                 }]
             }]
         })
 
-        return successResponse(res, 'success', video);
+        if (!video) {
+            return handleResponse(res, 404, false, 'Video not found')
+        }
+
+        const followersCount = await Follow.count({ where: { followingId: video.userId } })
+
+        const videoData = {
+            ...video.toJSON(),
+            creator: {
+                ...video.creator.toJSON(),
+                followers: followersCount
+            }
+        }
+
+        return successResponse(res, 'success', videoData);
     } catch (error) {
         console.log(error);
         return errorResponse(res, 'error', 'Internal Server Error')

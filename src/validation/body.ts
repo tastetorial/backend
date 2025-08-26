@@ -132,6 +132,48 @@ export const updateCategorySchema = z.object({
     path: []
 });
 
+export const updateUserSchema = z.object({
+    email: z
+        .email("Invalid email address")
+        .max(50, "Email must be at most 50 characters")
+        .optional(),
+
+    phone: z
+        .string()
+        .min(7, "Phone must be at least 7 digits")
+        .max(20, "Phone must be at most 20 characters")
+        .optional(),
+
+    username: z
+        .string()
+        .max(20, "Username must be at most 20 characters")
+        .optional(),
+
+    firstname: z
+        .string()
+        .max(100, "Firstname must be at most 100 characters")
+        .optional(),
+
+    lastname: z
+        .string()
+        .max(100, "Lastname must be at most 100 characters")
+        .optional(),
+
+    avatar: z
+        .url("Avatar must be a valid URL")
+        .optional(),
+
+    birthday: z
+        .string()
+        .refine(
+            (val) => !isNaN(Date.parse(val)),
+            { message: "Birthday must be a valid date (YYYY-MM-DD)" }
+        )
+        .optional(),
+
+    bio: z.string().optional()
+});
+
 
 
 

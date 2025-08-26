@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.upload = void 0;
 const multer_1 = __importDefault(require("multer"));
+const configSetup_1 = __importDefault(require("../config/configSetup"));
 // const fs = require('fs')
 // const path = require('path')
 // const pathExistsOrCreate = (dirPath: string): string => {
@@ -30,5 +31,5 @@ const multer_1 = __importDefault(require("multer"));
 const storage = multer_1.default.memoryStorage();
 exports.upload = (0, multer_1.default)({
     storage: storage,
-    limits: { fileSize: 10 * 1024 * 1024 } // 5MB
+    limits: { fileSize: configSetup_1.default.MAX_FILE_SIZE * 1024 * 1024 }
 });

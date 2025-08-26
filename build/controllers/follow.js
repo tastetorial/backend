@@ -9,12 +9,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getFollowing = exports.getFollowers = exports.isFollowing = exports.unfollow = exports.follow = void 0;
+exports.getFollowing = exports.getFollowers = exports.isFollowing = exports.unfollow = exports.toggleFollow = void 0;
 const Models_1 = require("../models/Models");
 const modules_1 = require("../utils/modules");
-const follow = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const toggleFollow = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const followerId = req.user.id;
-    const { followingId } = req.body;
+    const { followingId } = req.params;
     if (followerId === followingId) {
         return res.status(400).json({ message: "You can't follow yourself." });
     }
@@ -23,16 +23,17 @@ const follow = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             where: { followerId, followingId },
         });
         if (!created) {
-            return res.status(409).json({ message: 'Already following.' });
+            yield follow.destroy();
+            return (0, modules_1.successResponse)(res, 'success', { following: false, message: 'Already following. Unfollowed now.' });
         }
-        return res.status(201).json({ message: 'Now following.', data: follow });
+        return (0, modules_1.successResponse)(res, 'success', { following: true, message: 'Now following.' });
     }
     catch (err) {
         console.error(err);
         return res.status(500).json({ message: 'Server error.' });
     }
 });
-exports.follow = follow;
+exports.toggleFollow = toggleFollow;
 // Unfollow a user
 const unfollow = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const followerId = req.user.id;
@@ -60,10 +61,10 @@ const isFollowing = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const follow = yield Models_1.Follow.findOne({
             where: { followerId: id, followingId },
         });
-        return res.status(200).json({ following: Boolean(follow) });
+        return (0, modules_1.successResponse)(res, 'success', { following: Boolean(follow) });
     }
     catch (err) {
-        return res.status(500).json({ message: 'Server error.' });
+        return (0, modules_1.errorResponse)(res, 'error', 'Internal server error');
     }
 });
 exports.isFollowing = isFollowing;

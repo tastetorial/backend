@@ -2,6 +2,7 @@ import { Table, Model, Column, DataType, HasOne, BelongsToMany, HasMany, AllowNu
 import { Follow } from './Follow';
 import { UserRole, UserStatus } from '../enum';
 import { Video } from './Video';
+import { Creator } from './Creator';
 
 
 
@@ -89,6 +90,8 @@ export class User extends Model {
     deviceToken!: string;
 
 
+    @HasOne(() => Creator)
+    creator!: Creator
 
     @HasMany(() => Video)
     videos!: Video[]

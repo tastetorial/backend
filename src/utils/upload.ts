@@ -1,5 +1,6 @@
 
 import multer from "multer";
+import config from '../config/configSetup';
 // const fs = require('fs')
 // const path = require('path')
 
@@ -38,7 +39,7 @@ const storage = multer.memoryStorage();
 
 export const upload = multer({
     storage: storage,
-    limits: { fileSize: 10 * 1024 * 1024 } // 5MB
+    limits: { fileSize: config.MAX_FILE_SIZE * 1024 * 1024 }
 });
 
 

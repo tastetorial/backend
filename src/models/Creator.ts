@@ -24,6 +24,7 @@ export class Creator extends Model {
 
 
     @AllowNull(false)
+    @ForeignKey(() => User)
     @Column(DataType.BIGINT)
     userId!: number;
 

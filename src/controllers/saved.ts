@@ -62,7 +62,7 @@ export const getMySavedVideos = async (req: Request, res: Response) => {
 }
 
 export const toggleSaveVideo = async (req: Request, res: Response) => {
-    const { videoId } = req.body;
+    const { videoId } = req.params;
 
     try {
         const savedVideo = await SavedVideo.findOne({
@@ -74,7 +74,7 @@ export const toggleSaveVideo = async (req: Request, res: Response) => {
 
         if (savedVideo) {
             await savedVideo.destroy();
-            return successResponse(res, 'success', { message: 'Video unsaved' });
+            return successResponse(res, 'success', { saved: false, message: 'Removed from saved videos' });
         }
 
         const saved = SavedVideo.create({
@@ -82,7 +82,7 @@ export const toggleSaveVideo = async (req: Request, res: Response) => {
             videoId
         })
 
-        return successResponse(res, 'success', { message: 'Saved Video' });
+        return successResponse(res, 'success', { saved: true, message: 'Video saved' });
     } catch (error) {
         console.log(error);
         return errorResponse(res, 'error', 'Error while saving video');
@@ -101,10 +101,10 @@ export const isSavedVideo = async (req: Request, res: Response) => {
         })
 
         if (savedVideo) {
-            return successResponse(res, 'success', { isSaved: true });
+            return successResponse(res, 'success', { saved: true });
         }
 
-        return successResponse(res, 'success', { isSaved: false });
+        return successResponse(res, 'success', { saved: false });
     } catch (error) {
         console.log(error);
         return errorResponse(res, 'error', 'Error while checking saved video');

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateCategorySchema = exports.addCategorySchema = exports.addCommentSchema = exports.updateVideoSchema = exports.createVideoSchema = exports.resetPasswordSchema = exports.changePasswordSchema = exports.updateProfileSchema = exports.verifyOTPSchema = exports.loginSchema = exports.creatorSchema = exports.registerSchema = void 0;
+exports.updateUserSchema = exports.updateCategorySchema = exports.addCategorySchema = exports.addCommentSchema = exports.updateVideoSchema = exports.createVideoSchema = exports.resetPasswordSchema = exports.changePasswordSchema = exports.updateProfileSchema = exports.verifyOTPSchema = exports.loginSchema = exports.creatorSchema = exports.registerSchema = void 0;
 const zod_1 = require("zod");
 const enum_1 = require("../enum");
 exports.registerSchema = zod_1.z.object({
@@ -111,4 +111,35 @@ exports.updateCategorySchema = zod_1.z.object({
 }).refine((data) => Object.keys(data).length > 0, {
     message: "At least one field must be provided",
     path: []
+});
+exports.updateUserSchema = zod_1.z.object({
+    email: zod_1.z
+        .email("Invalid email address")
+        .max(50, "Email must be at most 50 characters")
+        .optional(),
+    phone: zod_1.z
+        .string()
+        .min(7, "Phone must be at least 7 digits")
+        .max(20, "Phone must be at most 20 characters")
+        .optional(),
+    username: zod_1.z
+        .string()
+        .max(20, "Username must be at most 20 characters")
+        .optional(),
+    firstname: zod_1.z
+        .string()
+        .max(100, "Firstname must be at most 100 characters")
+        .optional(),
+    lastname: zod_1.z
+        .string()
+        .max(100, "Lastname must be at most 100 characters")
+        .optional(),
+    avatar: zod_1.z
+        .url("Avatar must be a valid URL")
+        .optional(),
+    birthday: zod_1.z
+        .string()
+        .refine((val) => !isNaN(Date.parse(val)), { message: "Birthday must be a valid date (YYYY-MM-DD)" })
+        .optional(),
+    bio: zod_1.z.string().optional()
 });

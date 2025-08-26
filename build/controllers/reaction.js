@@ -36,7 +36,13 @@ const toogleLike = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 yield reaction.save();
             }
         }
-        return (0, modules_1.successResponse)(res, 'success', reaction);
+        const likes = yield Reaction_1.Reaction.count({
+            where: {
+                videoId,
+                like: true
+            }
+        });
+        return (0, modules_1.successResponse)(res, 'success', Object.assign(Object.assign({}, reaction.toJSON()), { likes }));
     }
     catch (error) {
         console.log(error);
@@ -73,7 +79,8 @@ const getComments = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                     [sequelize_1.Op.ne]: null
                 }
             },
-            attributes: ['comment', 'createdAt'],
+            attributes: ['comment', 'commentedAt'],
+            order: [['commentedAt', 'DESC']],
             include: [{
                     model: User_1.User,
                     attributes: ['id', 'username', 'firstname', 'lastname', 'avatar']
@@ -104,14 +111,19 @@ const addComment = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 videoId,
                 userId: id
             }, defaults: {
-                comment
+                comment,
+                commentedAt: new Date()
             }
         });
         if (!created) {
             reaction.comment = comment;
+            reaction.commentedAt = new Date();
             yield reaction.save();
         }
-        return (0, modules_1.successResponse)(res, 'success', reaction);
+        const user = yield User_1.User.findByPk(id, {
+            attributes: ['id', 'firstname', 'lastname', 'username', 'email', 'avatar']
+        });
+        return (0, modules_1.successResponse)(res, 'success', Object.assign(Object.assign({}, reaction.toJSON()), { user }));
     }
     catch (error) {
         console.log(error);

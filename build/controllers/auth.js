@@ -116,7 +116,10 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
     let { email, password } = result.data;
     try {
-        let user = yield Models_1.User.findOne({ where: { email } });
+        let user = yield Models_1.User.findOne({
+            where: { email },
+            include: [Models_1.Creator]
+        });
         if (!user)
             return (0, modules_1.handleResponse)(res, 404, false, 'User not found');
         let passwordMatch = yield bcryptjs_1.default.compare(password, user.password || '');

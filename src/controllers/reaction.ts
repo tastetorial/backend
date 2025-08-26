@@ -29,7 +29,14 @@ export const toogleLike = async (req: Request, res: Response) => {
             }
         }
 
-        return successResponse(res, 'success', reaction);
+        const likes = await Reaction.count({
+            where: {
+                videoId,
+                like: true
+            }
+        })
+
+        return successResponse(res, 'success', { ...reaction.toJSON(), likes });
     } catch (error) {
         console.log(error);
         return errorResponse(res, 'error', 'Something went wrong');
@@ -68,7 +75,8 @@ export const getComments = async (req: Request, res: Response) => {
                     [Op.ne]: null
                 }
             },
-            attributes: ['comment', 'createdAt'],
+            attributes: ['comment', 'commentedAt'],
+            order: [['commentedAt', 'DESC']],
             include: [{
                 model: User,
                 attributes: ['id', 'username', 'firstname', 'lastname', 'avatar']
@@ -103,16 +111,22 @@ export const addComment = async (req: Request, res: Response) => {
                 videoId,
                 userId: id
             }, defaults: {
-                comment
+                comment,
+                commentedAt: new Date()
             }
         })
 
         if (!created) {
             reaction.comment = comment;
+            reaction.commentedAt = new Date();
             await reaction.save();
         }
 
-        return successResponse(res, 'success', reaction);
+        const user = await User.findByPk(id, {
+            attributes: ['id', 'firstname', 'lastname', 'username', 'email', 'avatar']
+        })
+
+        return successResponse(res, 'success', { ...reaction.toJSON(), user });
     } catch (error) {
         console.log(error);
         return errorResponse(res, 'error', 'Something went wrong');

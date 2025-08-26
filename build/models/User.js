@@ -14,6 +14,7 @@ const sequelize_typescript_1 = require("sequelize-typescript");
 const Follow_1 = require("./Follow");
 const enum_1 = require("../enum");
 const Video_1 = require("./Video");
+const Creator_1 = require("./Creator");
 let User = class User extends sequelize_typescript_1.Model {
 };
 exports.User = User;
@@ -87,6 +88,10 @@ __decorate([
     (0, sequelize_typescript_1.Column)(sequelize_typescript_1.DataType.STRING),
     __metadata("design:type", String)
 ], User.prototype, "deviceToken", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasOne)(() => Creator_1.Creator),
+    __metadata("design:type", Creator_1.Creator)
+], User.prototype, "creator", void 0);
 __decorate([
     (0, sequelize_typescript_1.HasMany)(() => Video_1.Video),
     __metadata("design:type", Array)

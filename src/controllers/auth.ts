@@ -1,6 +1,6 @@
 import { Request, Response, response } from 'express';
 import { getRandom, hash, handleResponse, successResponse, successResponseFalse, validateEmail, randomId, errorResponse } from '../utils/modules';
-import { User, OTP, Follow, Reaction, Video } from '../models/Models'
+import { User, OTP, Follow, Reaction, Video, Creator } from '../models/Models'
 import bcrypt from 'bcryptjs'
 import { sendEmail } from '../services/email';
 import { sign } from 'jsonwebtoken';
@@ -141,7 +141,10 @@ export const login = async (req: Request, res: Response) => {
     let { email, password } = result.data;
 
     try {
-        let user = await User.findOne({ where: { email } })
+        let user = await User.findOne({
+            where: { email },
+            include: [Creator]
+        })
 
         if (!user) return handleResponse(res, 404, false, 'User not found')
 

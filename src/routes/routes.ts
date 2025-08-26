@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 import { register, sendOTP, verifyOTP, login, me, resetPassword, changePassword, updateProfile, activateAccount } from "../controllers/auth";
 import { upload } from "../utils/upload";
-import { follow, getFollowers, getFollowing, isFollowing, unfollow } from "../controllers/follow";
+import { getFollowers, getFollowing, isFollowing, toggleFollow, unfollow } from "../controllers/follow";
 // import { createReaction, deleteReaction, getAverageRating, getLikes } from "../controllers/reaction";
 // import { getProfile, getProfiles } from "../controllers/profile";
 import { uploadFile } from "../controllers/upload";
@@ -13,6 +13,7 @@ import { approveCreator, getCreator, getCreators, rejectCreator, upgradeToCreato
 import { addComment, deleteComment, editComment, getComments, isLiked, toogleLike } from '../controllers/reaction'
 import { getMySavedVideos, isSavedVideo, toggleSaveVideo } from "../controllers/saved";
 import { createCategory, deleteCategory, getCategories, updateCategory } from "../controllers/category";
+import { deleteProfile, editProfile, getUserProfile, /*getUserDetails,*/ getUsers } from "../controllers/profile";
 
 router.post('/auth/register', register)
 router.post("/auth/activate", activateAccount);
@@ -24,10 +25,11 @@ router.get('/auth/me', me)
 router.post('/auth/reset-password', resetPassword)
 router.post('/auth/change-password', allowRoles('*'), changePassword)
 
-router.post('update-profile', allowRoles('*'), updateProfile)
-
-// router.get('/profiles', getProfiles);
-// router.get('/profiles/:userId', getProfile);
+router.post('/update-profile', allowRoles('*'), editProfile)
+router.get('/profiles', getUsers);
+router.get('/profiles/:userId', getUserProfile)
+// router.get('/profiles/details/:userId', getUserDetails);
+router.delete('/profiles', deleteProfile)
 
 router.post('/uploads/avatar', allowRoles('*'), upload.single('avatar'), uploadFile)
 router.post('/uploads/video', allowRoles(UserRole.CREATOR), upload.single('video'), uploadFile)
@@ -48,8 +50,7 @@ router.post('/view-video/:videoId', allowRoles('*'), viewVideo);
 router.post('/archive-video/:videoId', allowRoles(UserRole.CREATOR), archiveVideo);
 router.post('/publish-video/:videoId', allowRoles(UserRole.CREATOR), publishVideo);
 
-router.post('/follow', follow);
-router.delete('/unfollow', unfollow);
+router.post('/toggle-follow/:followingId', toggleFollow);
 router.get('/is-following/:followingId', isFollowing);
 router.get('/followers', getFollowers);
 router.get('/followings', getFollowing);
@@ -61,7 +62,7 @@ router.post('/comment', addComment)
 router.put('/comment/', editComment)
 router.delete('/comment/:videoId', deleteComment)
 
-router.post('/toggle-save', toggleSaveVideo)
+router.post('/toggle-save/:videoId', toggleSaveVideo)
 router.get('/get-saved', getMySavedVideos)
 router.get('/is-saved/:videoId', isSavedVideo)
 
