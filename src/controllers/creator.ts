@@ -32,12 +32,18 @@ export const upgradeToCreator = async (req: Request, res: Response) => {
             return handleResponse(res, 400, false, 'You must be a viewer to upgrade to a creator')
         }
 
-        const creator = await Creator.create({
-            userId: id,
-            bio,
-            status: CreatorStatus.PENDING
+        const [creator, created] = await Creator.findOrCreate({
+            where: {
+                userId: id,
+            }, defaults: {
+                bio,
+                status: CreatorStatus.PENDING
+            }
         })
 
+        if (!created) {
+            return handleResponse(res, 400, false, 'You have already applied to be a creator')
+        }
 
         return successResponse(res, 'success', 'Creator account created successfully, please wait for approval')
     } catch (error) {

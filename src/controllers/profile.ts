@@ -160,11 +160,11 @@ export const editProfile = async (req: Request, res: Response) => {
         })
 
         if (updated[0] === 0) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json({ message: 'No update was made' });
         }
 
         if (role === UserRole.CREATOR && bio) {
-            const updatedCreator = Creator.update({
+            const updatedCreator = await Creator.update({
                 bio: bio
             }, {
                 where: {

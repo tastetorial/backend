@@ -147,10 +147,10 @@ const editProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             where: { id: id }
         });
         if (updated[0] === 0) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json({ message: 'No update was made' });
         }
         if (role === enum_1.UserRole.CREATOR && bio) {
-            const updatedCreator = Models_1.Creator.update({
+            const updatedCreator = yield Models_1.Creator.update({
                 bio: bio
             }, {
                 where: {

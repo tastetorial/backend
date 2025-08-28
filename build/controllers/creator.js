@@ -35,11 +35,17 @@ const upgradeToCreator = (req, res) => __awaiter(void 0, void 0, void 0, functio
         if (user.role !== enum_1.UserRole.VIEWER) {
             return (0, modules_1.handleResponse)(res, 400, false, 'You must be a viewer to upgrade to a creator');
         }
-        const creator = yield Models_1.Creator.create({
-            userId: id,
-            bio,
-            status: enum_1.CreatorStatus.PENDING
+        const [creator, created] = yield Models_1.Creator.findOrCreate({
+            where: {
+                userId: id,
+            }, defaults: {
+                bio,
+                status: enum_1.CreatorStatus.PENDING
+            }
         });
+        if (!created) {
+            return (0, modules_1.handleResponse)(res, 400, false, 'You have already applied to be a creator');
+        }
         return (0, modules_1.successResponse)(res, 'success', 'Creator account created successfully, please wait for approval');
     }
     catch (error) {
